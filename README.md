@@ -1,4 +1,4 @@
-# zfdw-arbeitsweise
+# zfdw-ki-leitplanken
 
 **Eine Arbeitsweise für Projekte, in denen ein KI-Assistent mitbaut.** Kein Framework, keine
 Installation, keine Abhängigkeiten — sechs Methoden-Dokumente, drei Vorlagen, vier Slash-Commands,
@@ -130,6 +130,8 @@ er verhindert hätte. Siehe [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Was das hier nicht ist
 
+- **Kein Compliance-Framework.** „Leitplanken" meint hier Entwicklungspraxis, nicht EU AI Act,
+  Risikoklassen oder Nutzungsrichtlinien fürs Unternehmen. Wer das sucht, ist im falschen Repo.
 - **Kein Agenten-Framework.** Es installiert nichts und startet nichts.
 - **Kein Ersatz für Code-Review.** Es sorgt dafür, dass es etwas Prüfbares gibt.
 - **Keine Garantie.** Apache-2.0, ohne Gewährleistung — wie jede Methode gilt sie, bis sie in deinem

@@ -6,7 +6,7 @@
 | **Verantwortlich** | {{NAME}} |
 
 > Kopieren nach `docs/plan/PLAN.md`. Kurz halten — das hier ist ein Inhaltsverzeichnis, kein
-> Konzept. Methode: [01 — Sprintplan mit Write-Scope](https://github.com/sitelookgmbh-arch/zfdw-arbeitsweise/blob/main/methode/01_Sprintplan-und-Write-Scope.md).
+> Konzept. Methode: [01 — Sprintplan mit Write-Scope](https://github.com/sitelookgmbh-arch/zfdw-ki-leitplanken/blob/main/methode/01_Sprintplan-und-Write-Scope.md).
 
 ## Ziel
 

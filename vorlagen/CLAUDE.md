@@ -12,8 +12,8 @@
 > | nur bei bestimmter Arbeit | in einen **Skill**, mit Anker hier |
 > | auf Zuruf mit klarem Auftrag | in einen **Slash-Command** |
 >
-> Hintergrund: [Kontext-Budget](https://github.com/sitelookgmbh-arch/zfdw-arbeitsweise/blob/main/methode/03_Kontext-Budget.md) ·
-> [Schichten](https://github.com/sitelookgmbh-arch/zfdw-arbeitsweise/blob/main/methode/02_Schichten-Anweisung-Hook-Skill.md)
+> Hintergrund: [Kontext-Budget](https://github.com/sitelookgmbh-arch/zfdw-ki-leitplanken/blob/main/methode/03_Kontext-Budget.md) ·
+> [Schichten](https://github.com/sitelookgmbh-arch/zfdw-ki-leitplanken/blob/main/methode/02_Schichten-Anweisung-Hook-Skill.md)
 
 ---
 
