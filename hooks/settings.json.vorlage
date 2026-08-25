@@ -1,0 +1,26 @@
+{
+  "//": "Nach .claude/settings.json kopieren. Pfade relativ zur Repo-Wurzel.",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/guard-geschuetzte-daten.sh"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/stop-git-status.sh"
+          }
+        ]
+      }
+    ]
+  }
+}

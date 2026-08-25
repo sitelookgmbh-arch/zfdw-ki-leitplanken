@@ -1,0 +1,23 @@
+# Nach .claude/geschuetzte-pfade kopieren und auf die Projekt-Realitaet setzen.
+# Eine Zeile je glob-Muster. Geprueft wird gegen den vollen Pfad UND den
+# Dateinamen. Kommentare mit #.
+#
+# Existiert diese Datei nicht, gelten die Vorgaben aus dem Guard-Skript.
+# Existiert sie, gelten AUSSCHLIESSLICH die Muster hier — die Vorgaben also
+# bei Bedarf uebernehmen.
+
+*.env
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.pfx
+id_rsa*
+*secrets*
+*credentials*
+
+# Projektspezifisch ergaenzen, z. B.:
+# shared/data/*
+# seed/real/*
+# kunden-*.csv
