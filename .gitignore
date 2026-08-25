@@ -4,3 +4,7 @@ Thumbs.db
 *~
 .idea/
 .vscode/
+
+# Enthaelt Kunden-, System- und Personennamen — gehoert NIE in ein
+# oeffentliches Repo. Vorlage: werkzeuge/herkunft-begriffe.vorlage
+.herkunft-begriffe

@@ -25,7 +25,9 @@ kostet.
 - **Werkzeug-Abhängigkeiten.** Die Sammlung soll ohne Installation funktionieren. Ein Skript ist ok,
   eine Laufzeitumgebung nicht.
 - **Projekt- oder Kundenspezifisches.** Was nur in einem Projekt gilt, gehört in dessen
-  `docs/decisions/`.
+  `docs/decisions/`. Die Weiche dafür steht in
+  [06 — Herkunft und Weitergabe](methode/06_Herkunft-und-Weitergabe.md); vor einem PR aus
+  Kundenarbeit heraus bitte `werkzeuge/herkunft-check.sh` laufen lassen.
 - **Regeln ohne Fehlschlag dahinter.** Die Sammlung ist bewusst schmal. Jede zusätzliche Seite senkt
   die Wahrscheinlichkeit, dass die vorhandenen gelesen werden — genau der Mechanismus, den
   [03 — Kontext-Budget](methode/03_Kontext-Budget.md) beschreibt.

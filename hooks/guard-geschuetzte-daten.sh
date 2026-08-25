@@ -36,6 +36,7 @@ VORGABE_MUSTER=(
   'id_rsa*'
   '*secrets*'
   '*credentials*'
+  '.herkunft-begriffe'
   'shared/data/*'
   'seed/real/*'
 )

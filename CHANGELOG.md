@@ -11,8 +11,10 @@ Erstveröffentlichung.
 
 ### Added
 
-- **Methode** — fünf Dokumente: Sprintplan mit Write-Scope · Schichten (Anweisung/Hook/Skill/Command)
-  · Kontext-Budget · Deterministische Guards · Verifikation statt Behauptung.
+- **Methode** — sechs Dokumente: Sprintplan mit Write-Scope · Schichten (Anweisung/Hook/Skill/Command)
+  · Kontext-Budget · Deterministische Guards · Verifikation statt Behauptung · Herkunft und
+  Weitergabe (die Weiche zwischen freier und kundengebundener Sammlung: drei Fragen vor dem
+  Schreiben, Overlay statt Kopie, Einbahnstraße frei→gebunden, ausführbares Herkunfts-Gate).
 - **Vorlagen** — `PLAN.md`, Sprint-Datei mit Write-Scope, Routing-Log und Versions-Relevanz, sowie
   eine schlanke Anweisungsdatei (`CLAUDE.md`) mit dem Richtwert 200 Zeilen.
 - **Commands** — `/sprint-planen`, `/sprint-starten`, `/sprint-abschliessen`, `/review-aenderungen`.
@@ -20,3 +22,6 @@ Erstveröffentlichung.
   — greift damit auch beim Bulk-Add, bei dem der Dateiname im Befehl nicht vorkommt),
   `stop-git-status.sh`, Verdrahtungs- und Musterdatei-Vorlagen sowie eine Testsuite mit 14 Fällen,
   davon 6 bewusste Nicht-Treffer.
+- **Werkzeuge** — `herkunft-check.sh`: prüft den Arbeitsbaum vor einer Veröffentlichung gegen eine
+  gepflegte Begriffsliste (Kunden, Systeme, Domains, Fachvokabular, Personen). Untere Schranke, kein
+  Ersatz für das Lesen der Belege.

@@ -1,8 +1,8 @@
 # zfdw-arbeitsweise
 
 **Eine Arbeitsweise für Projekte, in denen ein KI-Assistent mitbaut.** Kein Framework, keine
-Installation, keine Abhängigkeiten — fünf Methoden-Dokumente, drei Vorlagen, vier Slash-Commands und
-zwei Hooks, die man einzeln übernehmen kann.
+Installation, keine Abhängigkeiten — sechs Methoden-Dokumente, drei Vorlagen, vier Slash-Commands,
+zwei Hooks und ein Prüfskript, die man einzeln übernehmen kann.
 
 | | |
 |---|---|
@@ -43,10 +43,11 @@ Alle vier sind lösbar, und zwar mit Dateien im Repo statt mit Disziplin. Genau 
 ## Was drin ist
 
 ```
-methode/     die fünf Dokumente — das Warum
+methode/     die sechs Dokumente — das Warum
 vorlagen/    PLAN.md, Sprint-Datei, Anweisungsdatei — das Was
 commands/    /sprint-planen · /sprint-starten · /sprint-abschliessen · /review-aenderungen
 hooks/       Guard gegen geschützte Daten + Turn-Ende-Signal, mit Testsuite
+werkzeuge/   Herkunfts-Gate: prüft vor einer Veröffentlichung auf Kundenbezug
 ```
 
 | Dokument | Beantwortet |
@@ -56,6 +57,7 @@ hooks/       Guard gegen geschützte Daten + Turn-Ende-Signal, mit Testsuite
 | [03 — Kontext-Budget](methode/03_Kontext-Budget.md) | Warum eine lange Anweisungsdatei weniger bewirkt als eine kurze |
 | [04 — Deterministische Guards](methode/04_Deterministische-Guards.md) | Was gehört in Code statt in einen Text? |
 | [05 — Verifikation statt Behauptung](methode/05_Verifikation-statt-Behauptung.md) | Wann ist „fertig" belegt? |
+| [06 — Herkunft und Weitergabe](methode/06_Herkunft-und-Weitergabe.md) | Was aus Kundenarbeit darf frei werden — und wie ohne zwei driftende Fassungen? |
 
 ## Anfangen — der kleinste sinnvolle Schritt
 
@@ -91,6 +93,15 @@ Dann `/sprint-planen <dein Vorhaben>`.
 
 **4. Alles andere später.** Wer mit allen vier Schritten gleichzeitig anfängt, hört nach dem zweiten
 auf.
+
+**Wenn du selbst aus Kundenarbeit destillierst:** vor der ersten Veröffentlichung
+[06 — Herkunft und Weitergabe](methode/06_Herkunft-und-Weitergabe.md) lesen und das Gate scharf
+stellen:
+
+```bash
+cp werkzeuge/herkunft-begriffe.vorlage .herkunft-begriffe   # auf die eigenen Kunden setzen
+werkzeuge/herkunft-check.sh
+```
 
 ## Woher das kommt
 

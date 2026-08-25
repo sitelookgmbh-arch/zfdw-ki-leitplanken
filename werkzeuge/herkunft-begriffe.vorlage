@@ -1,0 +1,25 @@
+# Nach .herkunft-begriffe kopieren und auf die eigenen Kunden setzen.
+# Eine Zeile je Begriff, erweiterter regulaerer Ausdruck, Gross-/Kleinschreibung
+# egal. Kommentare mit #.
+#
+# Die Liste wird laenger, als man denkt. Ergaenzen, sobald ein neuer Kunde,
+# ein neues Produkt oder ein neues Fachwort dazukommt — nicht erst vor dem Push.
+
+# --- Kunden- und Firmennamen ---
+# musterkunde
+# muster (gmbh|ag|kg)
+
+# --- Produkt- und Systemnamen ---
+# produktkuerzel
+# internes-tool
+
+# --- Domains und Hosts ---
+# kundendomain\.(de|net|com)
+# [a-z-]+\.internes-gate\.net
+
+# --- Fachvokabular, das nur dieser Kunde benutzt ---
+# spezialbegriff
+# hausinternes-kuerzel
+
+# --- Personennamen (Ansprechpartner, Kollegen beim Kunden) ---
+# nachname

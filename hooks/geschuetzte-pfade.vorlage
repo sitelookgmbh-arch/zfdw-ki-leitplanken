@@ -16,6 +16,7 @@
 id_rsa*
 *secrets*
 *credentials*
+.herkunft-begriffe
 
 # Projektspezifisch ergaenzen, z. B.:
 # shared/data/*
