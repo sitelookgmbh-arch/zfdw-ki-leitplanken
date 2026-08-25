@@ -52,7 +52,7 @@ Angriffsklassen schlicht nicht anwendbar. Das ist kein Befund, sondern der Bauzu
 Risiko liegt dann woanders: in dem, was im ausgelieferten Paket beim Anwender landet.
 
 Wer prüft, muss also erst wissen, **wo das Projekt gerade steht** — und darf den Prüfumfang danach
-zuschneiden. Was ausgelassen wird, wird benannt (siehe Routing-Log in
+zuschneiden. Was ausgelassen wird, wird benannt (siehe Abweichungstabelle in
 [01 — Sprintplan](01_Sprintplan-und-Write-Scope.md)).
 
 ## Prüfen

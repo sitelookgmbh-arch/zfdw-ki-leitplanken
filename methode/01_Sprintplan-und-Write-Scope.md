@@ -41,7 +41,7 @@ Link-Korrektur, Versions-Bump. Dafür kein Sprint. Alles andere schon.
 
 ### 2. Die Sprint-Datei ist der Zustand
 
-`status: planned | in-progress | review | done | blocked` im Frontmatter, `## Ergebnis` am Ende.
+`status: geplant | laufend | pruefung | abgeschlossen | blockiert` im Frontmatter, `## Ergebnis` am Ende.
 Kein separater Zustandsspeicher, keine State-Datei, kein JSON, kein Board-Tool. Wer den Stand wissen
 will, liest die Datei — Mensch wie KI, und beide sehen dasselbe.
 
@@ -63,11 +63,13 @@ ihn ist Parallelität ein Merge-Konflikt mit Anlauf.
 
 ### 4. Abweichungen werden protokolliert, bevor sie passieren
 
-Wer einen vorgesehenen Schritt überspringt, nennt ihn **vorher** im `## Routing-Log` beim Namen, mit
-einer Zeile Begründung.
+Wer einen vorgesehenen Schritt überspringt, trägt ihn **vorher** in die Tabelle
+`## Abweichungen und Risikoabnahme` ein: was ausgelassen wurde, warum, welches Restrisiko
+bleibt — und **wer es abgenommen hat**.
 
-Ein unprotokollierter Skip ist kein Spartrick, sondern von einer übersehenen Lücke nicht zu
-unterscheiden. Sparsam arbeiten: ja. Still: nein.
+Die letzte Spalte ist der eigentliche Mechanismus. Ein unprotokollierter Skip ist von einer
+übersehenen Lücke nicht zu unterscheiden; ein protokollierter ohne Namen ist keine Abnahme,
+sondern eine Hoffnung. Sparsam arbeiten: ja. Still: nein.
 
 ### 5. Die Version entscheidet der Release, nicht der Sprint
 
@@ -95,6 +97,22 @@ Trainingsstand und blinde Flecken; ihre Übereinstimmung ist korrelierte, nicht 
 Die Trennlinie ist scharf: Was durch **Nachsehen** widerlegbar ist — grep, Testlauf, Log, Beleg —,
 darf eine Prüfinstanz entscheiden. Was einen **besseren Gegenentwurf** verlangt, nicht.
 
+### 7. Belege entstehen beim Arbeiten, nicht danach
+
+Ein Akzeptanzkriterium ohne Beleg ist eine Behauptung. Zu jedem gehört deshalb, **womit** es
+belegt ist und **wo** der Beleg liegt: Befehlsausgabe, Protokolleintrag, Bildschirmfoto.
+
+Das kostet beim Arbeiten Minuten und spart sie in dem Moment, in dem jemand fragt: ein
+Kunde, ein Prüfer, oder man selbst ein halbes Jahr später. Wer in geregelten Umgebungen
+arbeitet — Informationssicherheits-Assessments, Datenschutz-Nachweise, Kundenaudits —, kennt
+die Alternative: die Woche vor dem Termin, in der aus Commit-Verläufen rekonstruiert wird,
+was damals geprüft wurde. Diese Rekonstruktion ist teuer und im Zweifel nicht belastbar.
+
+Dieselbe Logik trägt die übrigen Nachweisfelder der Vorlage: welche **Datenklasse** ein
+Abschnitt anfasst, welche **Zugänge** er braucht und wann sie zurückgehen, welche
+**Änderungsklasse** er hat und wer freigegeben hat. Das sind keine Formulare — das sind die
+vier Fragen, die im Ernstfall ohnehin gestellt werden.
+
 ## Was stattdessen oft versucht wird
 
 | Statt dessen … | … und das passiert |
@@ -113,8 +131,8 @@ darf eine Prüfinstanz entscheiden. Was einen **besseren Gegenentwurf** verlangt
       die dort nicht steht. Handarbeit, zehn Sekunden — ein Skript dafür ist mehr Wartungslast als
       Ertrag.
 - [ ] Jedes Akzeptanzkriterium ist abgehakt **oder** im `## Ergebnis` als bewusst offen benannt.
-- [ ] Jeder ausgelassene Schritt hat eine Zeile im `## Routing-Log`.
-- [ ] `## Ergebnis` ist gefüllt, **bevor** `status: done` gesetzt wird.
+- [ ] Jeder ausgelassene Schritt hat eine Zeile in der Abweichungstabelle.
+- [ ] `## Ergebnis` ist gefüllt, **bevor** `status: abgeschlossen` gesetzt wird.
 - [ ] `VERSION` wurde außerhalb des Release-Sprints nicht angefasst.
 
 ## Verwandt

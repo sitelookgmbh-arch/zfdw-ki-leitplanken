@@ -116,11 +116,19 @@ KI-Unterstützung baut — also aus Projekten, in denen es keine zweite Person g
 das Prozess-Disziplin erzwingt. Deshalb der Zuschnitt: **so wenig Zeremonie wie möglich, aber die
 harten Grenzen in Code.**
 
-Der Sprintplan-Gedanke ist angeregt durch die Plan-First-Orchestrierung von
+Die Sprint-Vorlage kommt aus **Kundenarbeit in geregelten Umgebungen** — dort, wo Belege
+nicht optional sind, weil Informationssicherheits-Assessments, Datenschutz-Nachweise und
+Kundenaudits danach fragen. Ihre Abschnitte sind entlang der Fragen geschnitten, die in
+solchen Prüfungen tatsächlich gestellt werden: Welche Daten? Wer durfte schreiben? Welche
+Zugänge, wie lange? Wer hat freigegeben? Was wurde ausgelassen — und wer hat das Restrisiko
+abgenommen?
+
+Der Grundgedanke „ein Arbeitsabschnitt = eine Datei, die zugleich der Zustand ist" ist
+angeregt durch die Plan-First-Orchestrierung von
 [CC_GodMode](https://github.com/cubetribe/ClaudeCode_GodMode-On) (Dennis Westermann) — dort
-eingebettet in ein umfangreiches Agenten-System mit eigener Toolchain. Was hier steht, ist eine
-eigenständige, deutlich schlankere Umsetzung ohne Laufzeit, ohne Agenten-Ensemble und ohne
-Zustandsschema: die Datei im Repo ist der Zustand.
+eingebettet in ein umfangreiches Agenten-System mit eigener Toolchain. Umsetzung, Schnitt
+und Nachweislogik hier sind eigenständig: kein Zustandsschema, kein Agenten-Ensemble, keine
+Laufzeit. Die Datei im Repo ist der Zustand.
 
 ## Mitmachen
 

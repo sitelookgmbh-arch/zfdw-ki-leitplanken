@@ -34,7 +34,7 @@ Vorhaben: $ARGUMENTS
    Aufteilung **verstecken** könnte. Fehler leben in den Nähten zwischen den Teilen — dort schaut
    sonst niemand hin. Wenn dir nichts einfällt, ist die Aufteilung wahrscheinlich zu grob.
 
-6. **Parallelität prüfen.** Nur Sprints mit disjunktem Write-Scope dürfen `ausfuehrung: parallel`.
+6. **Parallelität prüfen.** Nur Sprints mit disjunktem Write-Scope dürfen `schutzbedarf`/Write-Scope-Disjunktheit.
    Überschneidung ⇒ seriell, ohne Diskussion.
 
 ## Ausgabe

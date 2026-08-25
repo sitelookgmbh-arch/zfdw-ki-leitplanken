@@ -16,8 +16,8 @@ Zwei bis drei Sätze: was am Ende anders ist. Nicht was gebaut wird — was dana
 
 | Nr | Slug | Ziel in einer Zeile | Status |
 |---|---|---|---|
-| 01 | {{slug}} | | planned |
-| 02 | {{slug}} | | planned |
+| 01 | {{slug}} | | geplant |
+| 02 | {{slug}} | | geplant |
 
 ## Reihenfolge und Abhängigkeiten
 

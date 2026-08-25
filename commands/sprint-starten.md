@@ -1,9 +1,9 @@
 ---
-description: Startet einen Sprint — Preflight, Statuswechsel, Routing-Log-Eintrag vor der ersten Änderung.
+description: Startet einen Sprint — Preflight, Statuswechsel, Abweichungs-Eintrag vor der ersten Änderung.
 ---
 
 Starte den Sprint: $ARGUMENTS
-(Ohne Angabe: den nächsten mit `status: planned` aus `docs/plan/PLAN.md`.)
+(Ohne Angabe: den nächsten mit `status: geplant` aus `docs/plan/PLAN.md`.)
 
 ## Preflight — vor der ersten Änderung
 
@@ -13,27 +13,28 @@ Alles hier **vor** dem ersten Schreibzugriff. Scheitert ein Punkt, halte an und 
 2. Sprint-Datei lesen. Ziel, Nicht-Ziele, Write-Scope, Akzeptanzkriterien laut vorlesen (kurz).
 3. `PLAN.md` lesen: gelten die Annahmen noch? Eine geänderte Annahme wird im Plan korrigiert, nicht
    stillschweigend übergangen.
-4. Kein anderer Sprint mit `status: in-progress` beansprucht überlappende Dateien.
+4. Kein anderer Sprint mit `status: laufend` beansprucht überlappende Dateien.
 
-## Routing-Eintrag — ebenfalls vorher
+## Abweichungen — ebenfalls vorher eintragen
 
-Trage **eine Zeile** in den `## Routing-Log` der Sprint-Datei ein, bevor du arbeitest:
+Wird ein vorgesehener Schritt ausgelassen, kommt **vor** der Arbeit eine Zeile in die
+Tabelle `## Abweichungen und Risikoabnahme` der Sprint-Datei:
 
-```
-- <Datum> | Weg: schlank|voll | Signale: <Risikosignale oder "keine"> | ausgelassen: <Schritt + Begründung, oder "keine">
-```
+| Datum | Ausgelassen | Begründung | Restrisiko | Abgenommen von |
+|---|---|---|---|---|
 
-Den **vollen** Weg (nichts abkürzen) erzwingt jedes dieser Signale — die Liste steht in der
-Sprint-Datei und ist projektspezifisch: Authentifizierung und Berechtigungen · Datenmodell,
-Migrationen, Realdaten · Build-/Release-Pipeline und Deploy · `VERSION`/`CHANGELOG.md` · neue Module,
-Fremdschnittstellen, Breaking Changes.
+Die letzte Spalte braucht einen **Namen**. Ein Restrisiko ohne Person dahinter ist keine
+Abnahme, sondern eine Hoffnung — und im Assessment wertlos.
 
-Ohne Signal genügt der schlanke Weg. Aber: **jeder ausgelassene Schritt braucht seine Zeile.** Ein
-unprotokollierter Skip ist von einer übersehenen Lücke nicht zu unterscheiden.
+Nicht ausgelassen werden dürfen, unabhängig vom Zeitdruck, die Prüfungen zu:
+Berechtigungen und Rollen · Datenmodell, Migrationen, reale Daten · Schlüsselmaterial und
+Zugänge · Release- und Auslieferungspfade · Schnittstellen zu Fremdsystemen.
+
+Wer hier auslassen will, ändert nicht die Tabelle, sondern eskaliert.
 
 ## Dann arbeiten
 
-- `status: in-progress` setzen.
+- `status: laufend` setzen.
 - Nur innerhalb des Write-Scope schreiben. Muss eine Datei außerhalb angefasst werden: **anhalten**,
   `BLOCKED (scope)` melden, den Write-Scope mit dem Menschen erweitern — nicht einfach tun.
 - `VERSION` nicht anfassen.

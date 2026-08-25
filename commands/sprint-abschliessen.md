@@ -3,9 +3,9 @@ description: Schließt einen Sprint ab — Akzeptanzkriterien prüfen, Ergebnis 
 ---
 
 Schließe den Sprint ab: $ARGUMENTS
-(Ohne Angabe: den Sprint mit `status: in-progress`.)
+(Ohne Angabe: den Sprint mit `status: laufend`.)
 
-## Reihenfolge — `status: done` kommt zuletzt
+## Reihenfolge — `status: abgeschlossen` kommt zuletzt
 
 1. **Akzeptanzkriterien durchgehen.** Jedes einzeln, mit Beleg: die ausgeführte Zeile und ihre
    Ausgabe, oder die angesehene Stelle. Ein Kriterium ohne Beleg gilt als nicht erfüllt.
@@ -15,7 +15,7 @@ Schließe den Sprint ab: $ARGUMENTS
    halten. Jede Datei im Diff, die dort nicht steht, wird benannt — mit einer Erklärung, wie sie
    hineingekommen ist. Das ist kein Formalismus: genau hier zeigt sich Scope-Drift.
 
-3. **Routing-Log prüfen.** Hat jeder ausgelassene Schritt seine Zeile? Fehlt eine, jetzt nachtragen —
+3. **Abweichungen prüfen.** Hat jeder ausgelassene Schritt seine Zeile? Fehlt eine, jetzt nachtragen —
    mit dem Hinweis, dass sie nachgetragen wurde.
 
 4. **`## Ergebnis` schreiben.** Was tatsächlich passiert ist, Abweichungen vom Plan, offene
@@ -28,7 +28,7 @@ Schließe den Sprint ab: $ARGUMENTS
 6. **Versions-Relevanz** ist gesetzt (`keine | patch | minor | major`). `VERSION` bleibt unangetastet
    — die Zahl setzt der Release-Sprint.
 
-7. **`status: done`** — erst jetzt.
+7. **`status: abgeschlossen`** — erst jetzt.
 
 ## Ausgabe
 
