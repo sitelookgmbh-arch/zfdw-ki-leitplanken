@@ -40,6 +40,16 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
 
 ### Added
 
+- **Methode 07 — Verortung gegen SpecKit, BMAD, OpenSpec, GSD und Kiro.** Wer SDD kennt, ordnet
+  diese Sammlung sonst in dasselbe Fach wie fünf Werkzeuge ein, die etwas anderes tun. Der Text
+  benennt das gemeinsame Grundmuster der fünf, die vier Stellen, an denen hier anders geschnitten
+  wird (kein Werkzeug · Write-Scope als Zuständigkeit statt Reihenfolge · Nachweis statt
+  Akzeptanzkriterium · harte Grenzen in Code), was die fünf besser können, und wann man besser zu
+  einem von ihnen greift. Alle Angaben aus den Projekt-Repositorien vom 26.08.2026, mit Stand-Datum
+  im Kopf — die Seite ist selbst driftgefährdet. Dabei zwei Korrekturen an der verbreiteten
+  Darstellung: `gsd-build/get-shit-done` ist archiviert, das Projekt lebt als **GSD Core**
+  (`open-gsd/gsd-core`) weiter; und SpecKit ist mit dem `converge`-Schritt keine rein lineare Kette
+  mehr.
 - **Reifegrad-Einordnung im README: diese Sammlung ist *Spec-anchored*.** Ordnet die Methode in
   das übliche Raster des Spec-driven Development ein (Spec-first · Spec-anchored ·
   Spec-as-Source) und begründet, warum die beiden Nachbarstufen hier nicht taugen. Methode 01

@@ -1,7 +1,7 @@
 # zfdw-ki-leitplanken
 
 **Eine Arbeitsweise für Projekte, in denen ein KI-Assistent mitbaut.** Kein Framework, keine
-Installation, keine Abhängigkeiten — sechs Methoden-Dokumente, drei Vorlagen, vier Slash-Commands,
+Installation, keine Abhängigkeiten — sieben Methoden-Dokumente, drei Vorlagen, vier Slash-Commands,
 zwei Hooks und ein Prüfskript, die man einzeln übernehmen kann.
 
 | | |
@@ -54,10 +54,13 @@ in gewachsenen Kundenprojekten nicht trägt. Hier ist die Sprint-Datei der Stand
 Ankündigung: Sie wird beim Abschluss um das tatsächliche Ergebnis ergänzt und bleibt als
 Begründungsspur zum Diff liegen.
 
+Was das gegenüber SpecKit, BMAD, OpenSpec, GSD und Kiro bedeutet — und wann eines der fünf die
+bessere Wahl ist —, steht in [07 — Verortung](methode/07_Verortung.md).
+
 ## Was drin ist
 
 ```
-methode/     die sechs Dokumente — das Warum
+methode/     die sieben Dokumente — das Warum
 vorlagen/    PLAN.md, Sprint-Datei, Anweisungsdatei — das Was
 commands/    /sprint-planen · /sprint-starten · /sprint-abschliessen · /review-aenderungen
 hooks/       Guard gegen geschützte Daten + Turn-Ende-Signal, mit Testsuite
@@ -72,6 +75,7 @@ werkzeuge/   Herkunfts-Gate: prüft vor einer Veröffentlichung auf Kundenbezug
 | [04 — Deterministische Guards](methode/04_Deterministische-Guards.md) | Was gehört in Code statt in einen Text? |
 | [05 — Verifikation statt Behauptung](methode/05_Verifikation-statt-Behauptung.md) | Wann ist „fertig" belegt? |
 | [06 — Herkunft und Weitergabe](methode/06_Herkunft-und-Weitergabe.md) | Was aus Kundenarbeit darf frei werden — und wie ohne zwei driftende Fassungen? |
+| [07 — Verortung](methode/07_Verortung.md) | Was machen SpecKit, BMAD, OpenSpec, GSD und Kiro — und was bleibt hier übrig? |
 
 ## Anfangen — der kleinste sinnvolle Schritt
 
