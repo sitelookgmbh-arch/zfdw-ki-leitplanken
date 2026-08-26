@@ -26,7 +26,8 @@ Vorhaben: $ARGUMENTS
    - **Write-Scope vollständig.** Jede Datei, die der Sprint schreiben darf, steht drin. Heiße
      Dateien (`VERSION`, `CHANGELOG.md`, `README.md`, Anweisungsdatei, Plan-Dateien) bekommen genau
      einen Schreiber.
-   - **Akzeptanzkriterien nachprüfbar.** Zu jedem gehört eine Zeile, die man ausführen, oder ein
+   - **Akzeptanzkriterien nachprüfbar, in der Form *gegeben / wenn / dann*.** Ausgangszustand,
+     auslösende Handlung, beobachtbares Ergebnis — dazu die Zeile, die man ausführen, oder der
      Schritt, den man ansehen kann. „Funktioniert wieder" ist kein Kriterium.
    - **Versions-Relevanz** setzen. `VERSION` fasst kein normaler Sprint an.
 

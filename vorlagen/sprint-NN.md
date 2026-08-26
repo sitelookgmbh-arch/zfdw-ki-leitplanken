@@ -98,10 +98,15 @@ undokumentierte.
 Nicht „Akzeptanzkriterien", sondern Kriterium **plus Beleg**. Ein Kriterium ohne Beleg gilt
 als nicht erfüllt — im Review wie im Assessment.
 
+**Form des Kriteriums:** *Gegeben* — Ausgangszustand · *wenn* — auslösende Handlung · *dann*
+— beobachtbares Ergebnis. Wer ein Kriterium nicht in diese Form bringt, hat keines, sondern
+eine Absicht. „Funktioniert wieder" nennt weder den Ausgangszustand noch das, was man danach
+sehen können muss — und ist deshalb am Ende Verhandlungssache statt Prüfsache.
+
 | # | Kriterium | Beleg | Liegt wo |
 |---|---|---|---|
-| 1 | | Befehlsausgabe / Screenshot / Protokolleintrag | |
-| 2 | | | |
+| 1 | Gegeben ein Konto ohne Rolle *Prüfer*, wenn es `/freigabe` aufruft, dann Antwort 403 und **kein** Eintrag im Freigabeprotokoll | Befehlsausgabe + Protokollauszug | `docs/plan/sprint-07/` |
+| 2 | | Befehlsausgabe / Screenshot / Protokolleintrag | |
 
 ## 8. Verifikation
 

@@ -71,9 +71,22 @@ Repo. Bei Versehen: rotieren, nicht nur löschen.
 
 ---
 
-## 6. Harte Grenzen
+## 6. Grenzen — drei Stufen
 
-- {{GRENZE}} — durchgesetzt per Hook `{{HOOK}}`, nicht nur durch diesen Text.
+| Stufe | Bedeutung | Wo sie steht |
+|---|---|---|
+| **immer** | wird ohne Rückfrage getan | hier |
+| **erst fragen** | tragfähig, aber mehrdeutig oder nach außen wirksam: zeigen, dann auf Bestätigung ausführen | hier |
+| **nie** | nicht verhandelbar | **Hook** — Text allein genügt nicht |
+
+- **immer:** {{REGEL}}
+- **erst fragen:** {{REGEL}}
+- **nie:** {{GRENZE}} — durchgesetzt per Hook `{{HOOK}}`, nicht nur durch diesen Text.
+
+Die mittlere Stufe ist die, die meistens fehlt. Ohne sie kennt ein Assistent nur erlaubt und
+verboten und entscheidet den ganzen Graubereich selbst — dort liegen aber die Fälle, die
+teuer werden: Mail raus, Migration, Rückbau, alles mit Außenwirkung. Und eine Regel auf Stufe
+*nie*, die nur hier steht und in keinem Hook, ist keine Grenze, sondern eine Bitte.
 
 ---
 

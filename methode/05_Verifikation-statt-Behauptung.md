@@ -55,6 +55,29 @@ Wer prüft, muss also erst wissen, **wo das Projekt gerade steht** — und darf 
 zuschneiden. Was ausgelassen wird, wird benannt (siehe Abweichungstabelle in
 [01 — Sprintplan](01_Sprintplan-und-Write-Scope.md)).
 
+## Spec Drift — was Verifikation nicht fängt
+
+Verifikation prüft die Implementierung gegen das Kriterium. Sie prüft **nicht**, ob das Kriterium
+noch beschreibt, was das System tut. Läuft die Beschreibung der Implementierung hinterher, sind alle
+Prüfungen grün und die Dokumentation trotzdem falsch. Dieser Zustand ist teurer als eine offene
+Lücke, weil er wie Ordnung aussieht: Der nächste, der die Beschreibung liest — ein Kollege, ein
+Prüfer, ein Assistent im nächsten Kontextfenster — baut auf ihr auf.
+
+Für dieses Auseinanderdriften von Beschreibung und Code hat sich der Begriff **Spec Drift**
+eingebürgert. Er trifft nicht nur Spezifikationen: Ablaufdiagramme, Datenmodelle, Rollenmatrizen und
+Runbooks driften genauso, nur unauffälliger.
+
+Das Gegenmittel ist kein weiterer Test, sondern eine Regel über den Commit:
+
+- Wer den Code ändert, ändert **im selben Commit** die Stelle der Beschreibung, die ihn beschreibt.
+  Getrennte Commits werden getrennt vergessen.
+- Liegt die Beschreibung in einem **anderen Repo** oder außerhalb der Versionierung, ist der
+  Abgleich ein eigener Nachweis in Abschnitt 7 der Sprint-Datei — mit Datum. „Wird nachgezogen" ist
+  kein Nachweis.
+- Beim Prüfen einer Änderung gehört die Frage dazu: **Welche Beschreibung wird durch diesen Diff
+  falsch?** Fällt niemandem eine ein, ist entweder nichts Fachliches passiert — oder es hat niemand
+  nachgesehen.
+
 ## Prüfen
 
 - [ ] Hat jeder abgeschlossene Schritt eine benannte Prüfzeile — nicht nur ein „läuft"?
@@ -62,3 +85,4 @@ zuschneiden. Was ausgelassen wird, wird benannt (siehe Abweichungstabelle in
 - [ ] Misst sie das, was zählt — oder nur das, was leicht zu messen ist?
 - [ ] Wurde eine Oberflächenänderung im Release-Zustand angesehen, nicht nur im Debug-Modus?
 - [ ] Hat jeder Befund eine Fundstelle?
+- [ ] Welche Beschreibung wird durch diesen Diff falsch — und wurde sie im selben Commit angefasst?

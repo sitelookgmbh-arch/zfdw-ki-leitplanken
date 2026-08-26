@@ -29,6 +29,28 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
 - **Herkunftsangabe im README präzisiert.** Übernommen ist der Grundgedanke „ein
   Arbeitsabschnitt = eine Datei, die zugleich der Zustand ist". Schnitt, Nachweislogik und
   Umsetzung stammen aus Kundenarbeit in geregelten Umgebungen.
+- **Akzeptanzkriterien in der Form *gegeben / wenn / dann***. Abschnitt 7 der Sprint-Vorlage
+  verlangte bisher Kriterium plus Beleg, ließ das Kriterium selbst aber frei formuliert — und
+  ein frei formuliertes Kriterium bleibt am Ende Verhandlungssache. Die Vorlage nennt jetzt die
+  Form und zeigt sie an einem Beispiel; `/sprint-planen` fordert sie beim Anlegen ein.
+- **Abschnitt 6 der Anweisungs-Vorlage von einer Stufe auf drei erweitert** — *immer · erst
+  fragen · nie*. Bisher gab es dort nur die harte Grenze. Damit war der gesamte Graubereich
+  ungeregelt, also genau die Fälle mit Außenwirkung, in denen ein Assistent anhalten und fragen
+  soll. Stufe *nie* bleibt Hook-pflichtig.
+
+### Added
+
+- **Reifegrad-Einordnung im README: diese Sammlung ist *Spec-anchored*.** Ordnet die Methode in
+  das übliche Raster des Spec-driven Development ein (Spec-first · Spec-anchored ·
+  Spec-as-Source) und begründet, warum die beiden Nachbarstufen hier nicht taugen. Methode 01
+  nennt den Begriff an der Stelle, an der die Entscheidung tatsächlich fällt (Regel 2).
+- **Methode 05 um *Spec Drift* ergänzt** — der Fehlermodus, den Verifikation gerade nicht fängt:
+  Beschreibung und Code driften auseinander, alle Prüfungen bleiben grün, die Dokumentation ist
+  trotzdem falsch. Gegenmittel als Commit-Regel (dieselbe Änderung, derselbe Commit), plus die
+  Prüffrage „welche Beschreibung wird durch diesen Diff falsch?".
+- **Methode 01, Regel 8: Folge-Sprints beschreiben das Delta** — was hinzukommt, sich ändert
+  oder entfällt, statt den Gesamtzustand erneut zu beschreiben. Kopierter Gesamtzustand driftet
+  gegeneinander, verdeckt im Diff die eigentliche Änderung und füllt den Kontext.
 
 
 ## [0.1.0] — 2026-08-25
