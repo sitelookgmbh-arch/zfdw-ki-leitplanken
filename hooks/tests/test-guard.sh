@@ -73,5 +73,37 @@ pruefe "Vorgaben inaktiv bei eigener Datei" 0 "git add -A"
 rm -f .env .claude/geschuetzte-pfade
 
 echo
+echo "Gemessen statt geschaetzt:"
+# Ein geschuetzter Pfad ist bereits verfolgt und wurde geaendert.
+mkdir -p shared/data && echo '{"a":1}' > shared/data/echt.json
+git add -f shared/data/echt.json >/dev/null 2>&1
+git commit -qm fixture >/dev/null 2>&1
+echo '{"a":2}' > shared/data/echt.json
+pruefe "commit -am stagt verfolgte Datei"    2 "git commit -am 'wip'"
+pruefe "commit ohne -a stagt nichts"         0 "git commit -m 'wip'"
+git checkout -- shared/data/echt.json 2>/dev/null
+
+# `git add -u` fasst Unverfolgtes nicht an — `git status` haette es gemeldet.
+echo "GEHEIM=1" > .env
+pruefe "add -u ignoriert unverfolgte .env"   0 "git add -u"
+pruefe "add -A erfasst dieselbe .env"        2 "git add -A"
+rm -f .env
+git rm -q --cached shared/data/echt.json >/dev/null 2>&1
+rm -rf shared
+
+echo
+echo "Fail-closed ohne jq:"
+# Ohne jq kann der Guard nichts pruefen. Frueher lief er still durch.
+mkdir -p leerer_pfad
+echo "GEHEIM=1" > .env
+if printf '{"tool_input":{"command":"git add -A"}}' \
+   | PATH="$arbeitsplatz/leerer_pfad" /bin/bash "$GUARD" >/dev/null 2>&1; then
+  printf '  FEHL  %-46s (durchgelassen, erwartet Block)\n' "ohne jq blockt der Guard"; fehl=$((fehl+1))
+else
+  printf '  ok    %-46s (Code 2)\n' "ohne jq blockt der Guard"; ok=$((ok+1))
+fi
+rm -f .env
+
+echo
 echo "$ok bestanden, $fehl fehlgeschlagen"
 [ "$fehl" -eq 0 ]

@@ -7,6 +7,47 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
 
 ### Changed
 
+- **Der Guard misst, statt zu schätzen.** Bei den breiten Formen (`git add -A/.`, `git add -u`,
+  neu auch `git commit -a`) fragt er `git add --dry-run`, was der Befehl **tatsächlich** stagen
+  würde, statt `git status --porcelain` zu lesen und daraus zu schließen. `git status` weiß
+  nichts darüber, ob eine Datei vom Befehl überhaupt erfasst würde. Die Modi werden getrennt:
+  `-A`/`.`/`:/ ` gegen `git add -A --dry-run`, `-u` und `commit -a` gegen `git add -u --dry-run`.
+  Damit entfällt ein Fehlalarm, der vorher garantiert kam — `git add -u` bei gleichzeitig
+  herumliegender, unverfolgter `.env`. Fehlalarme sind nicht kosmetisch: Ein Guard, der grundlos
+  blockt, wird abgeschaltet und schützt danach gar nichts mehr. Ein leeres Messergebnis gilt als
+  Ergebnis, nicht als Fehlschlag; auf `git status` fällt der Guard nur zurück, wenn `--dry-run`
+  selbst fehlschlägt.
+- **`git commit -a` / `-am` wird mit abgedeckt.** Bisher sah der Guard nur `git add` — ein
+  `commit -am` an einer bereits verfolgten geschützten Datei lief daran vorbei.
+- **Fail-closed ohne `jq`.** Bisher fiel der Guard auf den Rohtext der Werkzeug-Eingabe zurück
+  („gröber, aber nicht blind"). Das war zu optimistisch: Ohne geparste Kommandozeile prüft er
+  praktisch nichts, und der Ausfall fällt niemandem auf, weil ein Guard im Alltag ohnehin nie
+  auslöst. Jetzt blockt er und nennt den Installationsbefehl.
+- **Testsuite 14 → 19 Fälle**, davon 8 bewusste Nicht-Treffer. Neu: `commit -am` mit verfolgter
+  geschützter Datei (blockt), `commit` ohne `-a` (blockt nicht), `add -u` mit unverfolgtem
+  Treffer (blockt nicht — der Fehlalarm, den die Messung verhindert), `add -A` mit derselben
+  Datei (blockt sehr wohl), Lauf ohne `jq` im PATH (blockt).
+
+### Added
+
+- **Methode 04 um zwei Prinzipien ergänzt.** *Die Wirkung messen, nicht schätzen* — es gibt fast
+  immer einen Weg, das Werkzeug selbst zu fragen (`--dry-run`, `nginx -t`, Trockenlauf) statt aus
+  dem Zustand daneben zu schließen. Und: *Ein Guard ohne Voraussetzung darf nicht still
+  durchlassen* — dieselbe Regel wie beim Prüfskript in Methode 05, mit umgekehrtem Vorzeichen.
+  Prüfliste um beide Fragen erweitert.
+
+### Notes
+
+- **Herkunft der drei Guard-Änderungen:** destilliert aus produktiver Kundenarbeit, wo sie aus
+  einem konkreten Hygiene-Befund entstanden sind — über hundert unverfolgte Dateien mit realen
+  Daten im Arbeitsverzeichnis, keine davon von `.gitignore` erfasst; ein `git add -A` hätte alle
+  committet, und die damalige Guard-Fassung hätte geschwiegen. Übernommen ist die Technik in
+  eigener Formulierung, ohne Projektbezug: Dieser Guard kennt keine Kundendateien und keine
+  Kundenpfade — die stehen in `.claude/geschuetzte-pfade` des jeweiligen Projekts. Herkunfts-Gate
+  vor der Veröffentlichung gelaufen, kein Treffer.
+
+### Changed
+
 - **Sprint-Vorlage vollständig neu geschnitten — nachweisgeführt statt ablaufgeführt.** Die
   bisherige Fassung folgte Abschnitt für Abschnitt der Vorlage aus CC_GodMode; das war eine
   Übersetzung, keine Eigenleistung, und bei proprietär lizenziertem Original der falsche Weg.

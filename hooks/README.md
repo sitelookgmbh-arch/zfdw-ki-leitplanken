@@ -12,7 +12,7 @@ darf. Begründung: [04 — Deterministische Guards](../methode/04_Deterministisc
 | `stop-git-status.sh` | Stop | Zeigt am Ende jedes Schritts, was tatsächlich geändert wurde |
 | `settings.json.vorlage` | — | Verdrahtung beider Hooks |
 | `geschuetzte-pfade.vorlage` | — | Schutzmuster, projektspezifisch zu setzen |
-| `tests/test-guard.sh` | — | 14 Fälle, davon 6 bewusste Nicht-Treffer |
+| `tests/test-guard.sh` | — | 19 Fälle, davon 8 bewusste Nicht-Treffer |
 
 ## Einbau
 
@@ -44,4 +44,24 @@ schützt er gar nichts mehr.
   fachliche Entscheidung hilft er nicht.
 - Er unterscheidet nicht, ob `git add` ein Befehl oder Teil eines Zitats ist. Liegt gleichzeitig eine
   geschützte Datei im Arbeitsbaum, blockt er auch dann. Bewusst so.
-- Ohne `jq` fällt er auf den Rohtext der Werkzeug-Eingabe zurück: gröber, aber nicht blind.
+- **Ohne `jq` blockt er.** Ohne geparste Kommandozeile prüft er nichts — und ein Guard, der auf einem
+  frisch aufgesetzten Rechner unbemerkt abgeschaltet ist, ist schlimmer als keiner. Fail-closed ist
+  hier die einzige vertretbare Richtung.
+
+## Gemessen, nicht geschätzt
+
+Bei den breiten Formen fragt der Guard `git add --dry-run`, was der Befehl **tatsächlich** stagen
+würde — statt `git status` zu lesen und daraus zu schließen. `git status` weiß nichts darüber, ob
+eine Datei vom Befehl überhaupt erfasst würde, und kennt die Wirkung von `.gitignore` in diesem
+Zusammenhang nicht.
+
+| Befehl | Was er anfasst | Womit gemessen |
+|---|---|---|
+| `git add -A` · `.` · `--all` · `:/` | auch Unverfolgtes | `git add -A --dry-run` |
+| `git add -u` · `--update` | nur bereits Verfolgtes | `git add -u --dry-run` |
+| `git commit -a` · `-am` | nur bereits Verfolgtes | `git add -u --dry-run` |
+
+Ohne diese Unterscheidung kommt ein Fehlalarm garantiert: `git add -u` bei gleichzeitig
+herumliegender, unverfolgter `.env`. Ein **leeres** Messergebnis ist ein Ergebnis („nichts
+betroffen"), kein Fehlschlag — auf `git status` fällt der Guard nur zurück, wenn `--dry-run` selbst
+fehlschlägt.

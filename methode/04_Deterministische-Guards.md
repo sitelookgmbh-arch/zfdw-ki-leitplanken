@@ -36,6 +36,19 @@ und ihn ablehnt. Kein Modell, keine Abwägung, kein Kontext, der ihn verdrängen
 Befehl?", sondern „welche Dateien würde dieser Befehl der Versionsverwaltung hinzufügen?". Der
 Unterschied ist der ganze Punkt — siehe `git add -A` oben.
 
+**Und die Wirkung messen, nicht schätzen.** Es gibt fast immer einen Weg, das Werkzeug selbst zu
+fragen, statt aus dem Zustand daneben zu schließen: `git add --dry-run` sagt, was gestagt würde,
+`nginx -t` sagt, ob die Konfiguration trägt, ein Paketmanager hat einen Trockenlauf. Wer stattdessen
+`git status` liest, misst etwas Ähnliches — und liegt genau dann falsch, wenn es darauf ankommt.
+
+**Ein Guard ohne Voraussetzung darf nicht still durchlassen.** Fehlt ihm ein Werkzeug, eine Datei
+oder eine Variable, ist sein Ergebnis „unbekannt", nicht „unbedenklich" — und in einem Guard heißt
+unbekannt: blocken und sagen, was fehlt. Das ist dieselbe Regel wie beim Prüfskript in
+[05](05_Verifikation-statt-Behauptung.md), nur mit umgekehrtem Vorzeichen: Ein Prüfskript ohne
+Voraussetzung darf nicht Grün melden, ein Guard ohne Voraussetzung nicht Durchfahrt. Ein Schutz, der
+auf einem frisch aufgesetzten Rechner unbemerkt abgeschaltet ist, ist schlimmer als keiner, weil
+niemand ihn vermisst.
+
 **Fehlalarme kosten mehr als sie scheinen.** Ein Guard, der zu oft grundlos blockt, wird umgangen —
 und danach schützt er gar nichts mehr. Zur Testsuite gehören deshalb ausdrücklich die Fälle, die
 **nicht** greifen dürfen.
@@ -59,4 +72,6 @@ dafür gibt es das Mensch-Gate aus [01 — Sprintplan](01_Sprintplan-und-Write-S
 - [ ] Gibt es eine Regel mit Rechts- oder Datenschutzfolge, die nur als Text existiert?
 - [ ] Prüft der Guard die Wirkung des Befehls — oder nur dessen Wortlaut?
 - [ ] Existiert eine Testsuite, und enthält sie bewusste Nicht-Treffer?
+- [ ] Misst der Guard die Wirkung — oder liest er einen Zustand daneben und schließt daraus?
+- [ ] Was tut er, wenn eine seiner Voraussetzungen fehlt? Blocken ist die einzige richtige Antwort.
 - [ ] Weiß der Assistent aus der Anweisungsdatei, warum er blockiert wird?

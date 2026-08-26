@@ -4,9 +4,10 @@
 # Blockt Versuche, geschuetzte Dateien in die Versionsverwaltung zu bringen.
 #
 # Prueft die WIRKUNG des Befehls, nicht seinen Wortlaut: bei einem Bulk-Add
-# (`git add -A`, `git add .`, `git add -u`) taucht der Dateiname im Befehl gar
-# nicht auf — genau dort versagt jede textuelle Regel. Der Guard sieht deshalb
-# nach, welche Dateien im Arbeitsbaum tatsaechlich betroffen waeren.
+# (`git add -A`, `git add .`, `git add -u`, `git commit -am`) taucht der
+# Dateiname im Befehl gar nicht auf — genau dort versagt jede textuelle Regel.
+# Der Guard misst deshalb mit `git add --dry-run`, was der Befehl tatsaechlich
+# stagen wuerde. Gemessen, nicht geschaetzt.
 #
 # Einbindung (.claude/settings.json):
 #   "hooks": { "PreToolUse": [ { "matcher": "Bash",
@@ -43,17 +44,29 @@ VORGABE_MUSTER=(
 
 eingabe=$(cat)
 
-# Werkzeug-Eingabe kann als JSON kommen; ohne jq faellt der Guard auf den
-# Rohtext zurueck — lieber grob pruefen als gar nicht.
-if command -v jq >/dev/null 2>&1; then
-  befehl=$(printf '%s' "$eingabe" | jq -r '.tool_input.command // empty' 2>/dev/null)
-else
-  befehl=""
+# jq ist Pflicht — und zwar funktionierendes jq, nicht nur vorhandenes.
+# Ohne jq laesst sich die Kommandozeile nicht sauber aus dem Werkzeug-Aufruf
+# lesen; der Guard wuerde auf Rohtext raten und im Zweifel nichts finden. Ein
+# Guard, der auf einem frisch aufgesetzten Rechner unbemerkt abgeschaltet ist,
+# ist schlimmer als keiner — deshalb blockt er hier, statt still durchzulassen.
+if ! jq --version >/dev/null 2>&1; then
+  {
+    echo "BLOCKIERT — Guard nicht einsatzfaehig: jq fehlt oder ist defekt."
+    echo "Ohne jq prueft dieser Hook nichts mehr, ohne dass es auffaellt."
+    echo "Installieren: brew install jq (macOS) bzw. apt install jq, dann erneut versuchen."
+  } >&2
+  exit 2
 fi
+
+befehl=$(printf '%s' "$eingabe" | jq -r '.tool_input.command // empty' 2>/dev/null)
 [ -z "$befehl" ] && befehl="$eingabe"
 
-# Nur git-add-artige Befehle interessieren.
-printf '%s' "$befehl" | grep -qE '(^|[;&|]|\s)git\s+(-[^ ]+\s+)*add(\s|$)' || exit 0
+# Nur Befehle interessieren, die etwas in die Versionsverwaltung bringen
+# koennen: git add in jeder Form — und git commit -a, das Aenderungen an
+# bereits verfolgten Dateien selbst stagt.
+printf '%s' "$befehl" | grep -qE '(^|[;&|]|\s)git\s+(-[^ ]+\s+)*add(\s|$)' \
+  || printf '%s' "$befehl" | grep -qE '(^|[;&|]|\s)git\s+commit([^;&|]*)?\s-[A-Za-z]*a' \
+  || exit 0
 
 repo_wurzel=$(git rev-parse --show-toplevel 2>/dev/null) || exit 0
 cd "$repo_wurzel" || exit 0
@@ -69,9 +82,32 @@ if [ -f "$musterdatei" ]; then
 fi
 [ ${#muster[@]} -eq 0 ] && muster=("${VORGABE_MUSTER[@]}")
 
-# Kandidaten = alles, was ein Add ueberhaupt erfassen koennte:
-# geaenderte und unverfolgte Dateien im Arbeitsbaum.
-kandidaten=$(git status --porcelain --untracked-files=all 2>/dev/null | sed 's/^...//' | sed 's/.* -> //')
+# Kandidaten: was der Befehl TATSAECHLICH stagen wuerde — gemessen mit
+# `git add --dry-run`, nicht geschaetzt mit `git status`. Der Unterschied ist
+# nicht kosmetisch: `git status` weiss nichts darueber, ob eine Datei vom
+# Befehl ueberhaupt erfasst wuerde, und beruecksichtigt .gitignore nicht.
+#
+#   -u / --update / commit -a  -> nur bereits Verfolgtes
+#   alles andere               -> auch Unverfolgtes
+#
+# Ohne diese Unterscheidung kommt ein Fehlalarm garantiert: `git add -u` bei
+# gleichzeitig herumliegender, unverfolgter .env. Und ein Guard, der grundlos
+# blockt, wird abgeschaltet — danach schuetzt er gar nichts mehr.
+if printf '%s' "$befehl" | grep -qE '(^|[;&|]|\s)git\s+(-[^ ]+\s+)*add\s+(-u|--update)(\s|$)' \
+   || printf '%s' "$befehl" | grep -qE '(^|[;&|]|\s)git\s+commit([^;&|]*)?\s-[A-Za-z]*a'; then
+  roh=$(git add -u --dry-run 2>/dev/null); rc=$?
+else
+  roh=$(git add -A --dry-run 2>/dev/null); rc=$?
+fi
+
+if [ "$rc" -ne 0 ]; then
+  # Rueckfall nur bei echtem Fehlschlag (alter git, Sonderzustand). Ein LEERES
+  # Messergebnis ist kein Fehlschlag, sondern die Aussage "nichts betroffen".
+  kandidaten=$(git status --porcelain --untracked-files=all 2>/dev/null | sed 's/^...//' | sed 's/.* -> //')
+else
+  # Zeilenformat: add 'pfad' / remove 'pfad'. Nur Hinzufuegen interessiert.
+  kandidaten=$(printf '%s\n' "$roh" | sed -n "s/^add '\(.*\)'$/\1/p")
+fi
 [ -z "$kandidaten" ] && exit 0
 
 treffer=()
