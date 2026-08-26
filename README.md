@@ -40,6 +40,20 @@ Alle vier sind lösbar, und zwar mit Dateien im Repo statt mit Disziplin. Genau 
 5. Wer einen Schritt auslässt, **nennt ihn vorher.** Ein unprotokollierter Skip ist von einer
    übersehenen Lücke nicht zu unterscheiden.
 
+## Einordnung
+
+Spec-driven Development kennt drei Reifegrade: **Spec-first** — einmal vor der Arbeit spezifiziert,
+danach liegt das Dokument still. **Spec-anchored** — die Spezifikation wird mitgeführt und beim
+Abschluss fortgeschrieben. **Spec-as-Source** — Menschen editieren nur noch die Spezifikation, nie
+den Code.
+
+Diese Sammlung ist **Spec-anchored**, und das ist eine Entscheidung, keine Zwischenstufe. Spec-first
+scheitert daran, dass das Dokument nach dem dritten Tag nicht mehr stimmt und niemand es merkt.
+Spec-as-Source setzt voraus, dass generierter Code nie von Hand angefasst wird — eine Annahme, die
+in gewachsenen Kundenprojekten nicht trägt. Hier ist die Sprint-Datei der Stand selbst, nicht dessen
+Ankündigung: Sie wird beim Abschluss um das tatsächliche Ergebnis ergänzt und bleibt als
+Begründungsspur zum Diff liegen.
+
 ## Was drin ist
 
 ```

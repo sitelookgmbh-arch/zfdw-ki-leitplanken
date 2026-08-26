@@ -48,6 +48,11 @@ will, liest die Datei — Mensch wie KI, und beide sehen dasselbe.
 Das ist die wichtigste Entscheidung dieser Methode. Ein zweiter Zustandsspeicher neben den Dateien
 driftet **immer** gegen das Repo; die Frage ist nur, wie lange es dauert.
 
+In der Sprache des Spec-driven Development ist das der Reifegrad **Spec-anchored**: Die
+Beschreibung wird mitgeführt statt einmal vorab geschrieben. Eine Sprint-Datei, die nach dem
+Abschluss nicht mehr angefasst wird, wäre Spec-first — und damit spätestens nach dem dritten Tag
+eine Beschreibung von etwas anderem als dem, was tatsächlich im Repo steht.
+
 ### 3. Write-Scope: jede Datei hat genau einen Schreiber
 
 Der Sprint listet auf, was er anfassen darf. Wer außerhalb schreiben will, **hält an** und meldet
@@ -113,6 +118,18 @@ Abschnitt anfasst, welche **Zugänge** er braucht und wann sie zurückgehen, wel
 **Änderungsklasse** er hat und wer freigegeben hat. Das sind keine Formulare — das sind die
 vier Fragen, die im Ernstfall ohnehin gestellt werden.
 
+### 8. Folge-Sprints beschreiben das Delta
+
+Der Normalfall ist nicht Neubau, sondern Änderung am Bestehenden. Ein Folge-Sprint beschreibt
+deshalb nur, was **hinzukommt, sich ändert oder entfällt** — nicht noch einmal den Gesamtzustand.
+Unverändertes bleibt unerwähnt.
+
+Wer den Gesamtzustand in jede Sprint-Datei kopiert, handelt sich drei Dinge auf einmal ein: Die
+Kopien driften gegeneinander, im Diff ist nicht mehr zu erkennen, worum es in diesem Abschnitt
+eigentlich ging, und der Kontext füllt sich mit Text, den niemand liest — genau der Mechanismus aus
+[03 — Kontext-Budget](03_Kontext-Budget.md). Der Gesamtzustand gehört in die laufende
+Dokumentation; die Sprint-Datei ist die Differenz dorthin, mit Datum und Namen.
+
 ## Was stattdessen oft versucht wird
 
 | Statt dessen … | … und das passiert |
@@ -122,6 +139,7 @@ vier Fragen, die im Ernstfall ohnehin gestellt werden.
 | **Write-Scope erst beim Konflikt klären.** | Der Konflikt ist der Merge — also nach der Arbeit, wenn Rückbau am teuersten ist. |
 | **Zielversion beim Start festlegen.** | Der Umfang ändert sich, die Zahl nicht. Am Ende stimmt das Changelog nicht mehr. |
 | **Sprint-Dateien für jede Kleinigkeit.** | Zeremonie ohne Ertrag. Die Vorlage wird als Bürokratie erlebt und dann für die großen Fälle *auch* nicht mehr benutzt. |
+| **Den Gesamtzustand in jede Sprint-Datei kopieren.** | Mehrere Fassungen derselben Beschreibung, die gegeneinander driften. Im Diff ist die eigentliche Änderung nicht mehr zu finden. |
 | **Noch ein Prüf-Durchlauf statt einer Entscheidung.** | Erzeugt selbstbewussten Konsens-Irrtum. Mehr Runden desselben Urteils sind nicht mehr Evidenz. |
 
 ## Prüfen, ob es eingehalten wurde
@@ -133,6 +151,7 @@ vier Fragen, die im Ernstfall ohnehin gestellt werden.
 - [ ] Jedes Akzeptanzkriterium ist abgehakt **oder** im `## Ergebnis` als bewusst offen benannt.
 - [ ] Jeder ausgelassene Schritt hat eine Zeile in der Abweichungstabelle.
 - [ ] `## Ergebnis` ist gefüllt, **bevor** `status: abgeschlossen` gesetzt wird.
+- [ ] Die Sprint-Datei beschreibt die **Änderung** — nicht noch einmal den Gesamtzustand.
 - [ ] `VERSION` wurde außerhalb des Release-Sprints nicht angefasst.
 
 ## Verwandt
