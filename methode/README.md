@@ -1,6 +1,6 @@
 # Methode
 
-Sieben Dokumente. Jedes beantwortet eine Frage, jedes nennt zuerst das Problem und dann die Regel — wer
+Acht Dokumente. Jedes beantwortet eine Frage, jedes nennt zuerst das Problem und dann die Regel — wer
 nur die Regel liest, kann sie nicht sinnvoll anpassen.
 
 | Dokument | Frage | Wichtigster Satz |
@@ -12,6 +12,7 @@ nur die Regel liest, kann sie nicht sinnvoll anpassen.
 | [05 — Verifikation statt Behauptung](05_Verifikation-statt-Behauptung.md) | Wann ist „fertig" belegt? | Wer gebaut hat, prüft mit denselben Annahmen. |
 | [06 — Herkunft und Weitergabe](06_Herkunft-und-Weitergabe.md) | Was aus Kundenarbeit darf frei werden? | Die Weiche steht vor dem ersten Satz, nicht vor dem Push. |
 | [07 — Verortung](07_Verortung.md) | Wie verhält sich das zu den SDD-Frameworks? | Write-Scope, Guard und Nachweis sind an keinen Ablauf gebunden. |
+| [08 — Spezifikationsgüte](08_Spezifikationsguete.md) | Woran erkennt man, ob eine Spec taugt? | Eine Spezifikation ist ein Informationsmodell — die Gütekriterien dafür sind älter als jedes Werkzeug. |
 
 ## Reihenfolge
 
@@ -21,3 +22,7 @@ Wer eine halbe Stunde hat: **01 und 04.** Das sind die beiden, deren Fehlen weht
 schiefgehen muss, um teuer zu werden. Vor der ersten Veröffentlichung lesen.
 **07** braucht nur, wer eines der SDD-Frameworks kennt oder einsetzt — oder wissen will, warum
 hier keines davon nachgebaut wird.
+
+**08** gehört zu 03 und 05 — es beantwortet, was dort vorausgesetzt wird: woran eine brauchbare
+Spezifikation zu erkennen ist. Sinnvoll erst, wenn die erste geschrieben ist. Ein Gütekriterium
+braucht einen Gegenstand.

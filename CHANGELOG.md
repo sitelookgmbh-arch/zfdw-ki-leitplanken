@@ -29,6 +29,18 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
   Datei (blockt sehr wohl), Lauf ohne `jq` im PATH (blockt).
 
 ### Added
+- **Methode 08 — Spezifikationsgüte.** Werkzeuge sagen, *wie* eine Spec auszusehen hat; keines
+  sagt, *ob sie gut ist*. Der Text überträgt die **Grundsätze ordnungsmäßiger Modellierung** (Becker,
+  Rosemann, Schütte 1995) auf Spezifikationen für KI-gestützte Arbeit — Richtigkeit, Relevanz,
+  Wirtschaftlichkeit, Klarheit, Vergleichbarkeit, systematischer Aufbau. Der Übertrag trägt, weil eine
+  Spec ein Informationsmodell ist: ein Ausschnitt der Wirklichkeit, für einen Zweck, eine Leserschaft
+  und eine Notation, mit Bezug zu Nachbardokumenten. Eine Abweichung vom Original ist ausgewiesen: Die
+  GoM setzen einen menschlichen Leser voraus; hier sind es zwei Adressaten mit verschiedenen Schwächen
+  — der Mensch überliest Widersprüche und ergänzt still, das Modell tut beides nicht. Klarheit wird
+  dadurch strenger, nicht weicher. Der Text nennt außerdem seine Grenze: Die Grundsätze sagen, ob eine
+  Spec **taugt**, nicht ob sie **stimmt** — dafür bleibt Methode 05 zuständig. Die Grundsätze selbst
+  werden nicht wiedergegeben, nur ihre Anwendung; Herleitung mit Quellenangabe im Text.
+
 
 - **Methode 04 um zwei Prinzipien ergänzt.** *Die Wirkung messen, nicht schätzen* — es gibt fast
   immer einen Weg, das Werkzeug selbst zu fragen (`--dry-run`, `nginx -t`, Trockenlauf) statt aus
