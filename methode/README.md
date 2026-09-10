@@ -1,6 +1,6 @@
 # Methode
 
-Acht Dokumente. Jedes beantwortet eine Frage, jedes nennt zuerst das Problem und dann die Regel — wer
+Neun Dokumente. Jedes beantwortet eine Frage, jedes nennt zuerst das Problem und dann die Regel — wer
 nur die Regel liest, kann sie nicht sinnvoll anpassen.
 
 | Dokument | Frage | Wichtigster Satz |
@@ -13,6 +13,7 @@ nur die Regel liest, kann sie nicht sinnvoll anpassen.
 | [06 — Herkunft und Weitergabe](06_Herkunft-und-Weitergabe.md) | Was aus Kundenarbeit darf frei werden? | Die Weiche steht vor dem ersten Satz, nicht vor dem Push. |
 | [07 — Verortung](07_Verortung.md) | Wie verhält sich das zu den SDD-Frameworks? | Write-Scope, Guard und Nachweis sind an keinen Ablauf gebunden. |
 | [08 — Spezifikationsgüte](08_Spezifikationsguete.md) | Woran erkennt man, ob eine Spec taugt? | Eine Spezifikation ist ein Informationsmodell — die Gütekriterien dafür sind älter als jedes Werkzeug. |
+| [09 — Systembeschreibung](09_Systembeschreibung.md) | Woher weiß der Assistent, was die Anwendung überhaupt ist? | Der Nutzen dieser Ebene entsteht nicht beim Schreiben, sondern beim Gegenlesen. |
 
 ## Reihenfolge
 
@@ -26,3 +27,7 @@ hier keines davon nachgebaut wird.
 **08** gehört zu 03 und 05 — es beantwortet, was dort vorausgesetzt wird: woran eine brauchbare
 Spezifikation zu erkennen ist. Sinnvoll erst, wenn die erste geschrieben ist. Ein Gütekriterium
 braucht einen Gegenstand.
+
+**09** gehört ebenfalls zu 03 — es beschreibt, was aus der Anweisungsdatei herausgehalten wird und
+wohin es stattdessen gehört. Wer an einer gewachsenen Anwendung arbeitet, liest es früh; bei einem
+neuen Vorhaben ohne Vorsystem und ohne Datenhaltung ist es entbehrlich.

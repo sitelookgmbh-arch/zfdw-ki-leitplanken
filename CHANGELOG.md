@@ -29,6 +29,23 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
   Datei (blockt sehr wohl), Lauf ohne `jq` im PATH (blockt).
 
 ### Added
+- **Methode 09 — Systembeschreibung.** Die Anweisungsdatei ist zu klein für ein Datenmodell, der
+  Code zu groß zum Lesen — dazwischen fehlt eine Ebene. Der Text beschreibt sie als **vier Dateien
+  mit vier verschiedenen Fragen**: was das System ist (Systembeschreibung), wie die Dinge heißen
+  (Schema), wo sie tatsächlich stehen (Mapping gegen das laufende Zielsystem), was als Nächstes
+  kommt (Sprintbogen, siehe Methode 01). Jede hat eine andere Lebensdauer und einen anderen
+  Prüfweg; sie zusammenzuziehen kostet genau den Nutzen, den die Trennung erzeugt. Zwei Abschnitte
+  tragen die Last: die **Schichtung der Wahrheit** — welche Schicht wofür maßgeblich ist und wer
+  sie schreibt, weil der Assistent sonst plausibel auf die einfachste Bauart rät (eine Quelle,
+  alles schreibbar) — und eine **Rangfolge bei Widerspruch**, die in den Dateien selbst steht statt
+  im Kopf dessen, der sie zuletzt angefasst hat. Belegt an einem tatsächlichen Befund: ein Feld,
+  das die Oberfläche als extern gespeist auswies, das im Mapping verzeichnet war und in keiner
+  Lieferliste stand — monatelang als Verzögerung der Datenlieferung geführt, tatsächlich war nie
+  eine Lieferung vereinbart. Gefunden beim Gegenlesen der drei Dateien, nicht beim Testen. Daraus
+  die beiden Sätze, auf die es ankommt: Der Nutzen dieser Ebene entsteht beim Gegenlesen, nicht
+  beim Schreiben. Und: Ein Feld ohne benannte Quelle ist ein offener Punkt, kein Feld. Die Grenze
+  ist ausgewiesen — vier ist eine Obergrenze, keine Vorgabe; ohne Vorsystem kein Mapping, ohne
+  Datenhaltung kein Schema.
 - **Methode 08 — Spezifikationsgüte.** Werkzeuge sagen, *wie* eine Spec auszusehen hat; keines
   sagt, *ob sie gut ist*. Der Text überträgt die **Grundsätze ordnungsmäßiger Modellierung** (Becker,
   Rosemann, Schütte 1995) auf Spezifikationen für KI-gestützte Arbeit — Richtigkeit, Relevanz,
