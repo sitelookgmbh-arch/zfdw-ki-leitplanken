@@ -7,6 +7,7 @@ Zum Kopieren ins eigene Projekt. Platzhalter in `{{DOPPELTEN_KLAMMERN}}` ersetze
 | [`PLAN.md`](PLAN.md) | `docs/plan/PLAN.md` | Das Vorhaben: Ziel, Sprint-Liste, Reihenfolge, Annahmen |
 | [`sprint-NN.md`](sprint-NN.md) | `docs/plan/sprint-NN-<slug>.md` | Ein Arbeitsabschnitt: Write-Scope, Akzeptanzkriterien, Abweichungen mit Risikoabnahme, Nachweise, Ergebnis |
 | [`CLAUDE.md`](CLAUDE.md) | `CLAUDE.md` (Repo-Wurzel) | Anweisungsdatei, schlank gehalten — Richtwert 200 Zeilen |
+| [`entscheidung.md`](entscheidung.md) | `docs/decisions/JJJJ-MM-TT-<slug>.md` | Eine Entscheidung in fünf Pflichtfeldern, dazu „Fakt oder Urteil?“ vor der Gegenprüfung und Implementierungsnotizen nach der Umsetzung |
 
 ## `docs/plan/` neben `docs/decisions/`
 
