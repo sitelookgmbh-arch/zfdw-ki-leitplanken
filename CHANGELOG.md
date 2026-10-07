@@ -10,6 +10,11 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
   verworfene Alternative, Randbedingungen, bewusst außerhalb, betroffene Schnittstellen. Dazu
   die Prüffrage „Fakt oder Urteil?“ vor jeder Gegenprüfung und Implementierungsnotizen nach der
   Umsetzung (Verworfen · Annahme ohne Beleg · Bewusst weggelassen).
+- **Methode 03: Regeln altern mit dem Modell.** Regeln nach P/S/K/M einteilen (Präferenz,
+  Sicherheit, Korrektur gegen eine Modellschwäche, Mischform). Beim Wechsel des Standardmodells
+  K-Regeln aus der Zeit davor testen statt mitschleppen; Denkaufwand je Arbeitsart ebenfalls
+  nachprüfen. Angeregt durch eine Bemerkung von Thariq Shihipar (Anthropic) im Podcast
+  *Latent Space*, 29.09.2026.
 - **Sprint-Vorlage, Abschnitt 12:** Implementierungsnotizen als fester Teil des Ergebnisses.
 
 ## [0.2.0] — 2026-10-07
