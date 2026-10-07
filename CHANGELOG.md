@@ -5,6 +5,8 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
 
 ## [Unreleased]
 
+## [0.2.0] — 2026-10-07
+
 ### Changed
 
 - **Der Guard misst, statt zu schätzen.** Bei den breiten Formen (`git add -A/.`, `git add -u`,

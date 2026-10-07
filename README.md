@@ -1,12 +1,12 @@
 # zfdw-ki-leitplanken
 
 **Eine Arbeitsweise für Projekte, in denen ein KI-Assistent mitbaut.** Kein Framework, keine
-Installation, keine Abhängigkeiten — sieben Methoden-Dokumente, drei Vorlagen, vier Slash-Commands,
+Installation, keine Abhängigkeiten — neun Methoden-Dokumente, drei Vorlagen, vier Slash-Commands,
 zwei Hooks und ein Prüfskript, die man einzeln übernehmen kann.
 
 | | |
 |---|---|
-| **Version** | v0.1.0 |
+| **Version** | v0.2.0 |
 | **Werkzeug** | geschrieben für [Claude Code](https://claude.com/claude-code); die Methode gilt für jeden Assistenten mit Dateizugriff |
 | **Sprache** | Deutsch |
 | **Lizenz** | [Apache-2.0](LICENSE) — frei nutzbar, auch kommerziell |
@@ -60,10 +60,10 @@ bessere Wahl ist —, steht in [07 — Verortung](methode/07_Verortung.md).
 ## Was drin ist
 
 ```
-methode/     die sieben Dokumente — das Warum
+methode/     die neun Dokumente — das Warum
 vorlagen/    PLAN.md, Sprint-Datei, Anweisungsdatei — das Was
 commands/    /sprint-planen · /sprint-starten · /sprint-abschliessen · /review-aenderungen
-hooks/       Guard gegen geschützte Daten + Turn-Ende-Signal, mit Testsuite
+hooks/       Guard gegen geschützte Daten + Turn-Ende-Signal, mit Testsuite und Rot-Beweis
 werkzeuge/   Herkunfts-Gate: prüft vor einer Veröffentlichung auf Kundenbezug
 ```
 
@@ -76,6 +76,8 @@ werkzeuge/   Herkunfts-Gate: prüft vor einer Veröffentlichung auf Kundenbezug
 | [05 — Verifikation statt Behauptung](methode/05_Verifikation-statt-Behauptung.md) | Wann ist „fertig" belegt? |
 | [06 — Herkunft und Weitergabe](methode/06_Herkunft-und-Weitergabe.md) | Was aus Kundenarbeit darf frei werden — und wie ohne zwei driftende Fassungen? |
 | [07 — Verortung](methode/07_Verortung.md) | Was machen SpecKit, BMAD, OpenSpec, GSD und Kiro — und was bleibt hier übrig? |
+| [08 — Spezifikationsgüte](methode/08_Spezifikationsguete.md) | Woran erkennt man, ob eine Spec taugt? |
+| [09 — Systembeschreibung](methode/09_Systembeschreibung.md) | Woher weiß der Assistent, was die Anwendung überhaupt ist? |
 
 ## Anfangen — der kleinste sinnvolle Schritt
 
