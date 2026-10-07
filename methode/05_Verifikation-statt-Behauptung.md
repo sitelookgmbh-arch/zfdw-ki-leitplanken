@@ -42,6 +42,69 @@ als gar keine Prüfung.
 **Nichts erfinden.** Pfade, Namen, Nummern, Normverweise, Versionen nicht raten. Nicht belegt →
 weglassen oder fragen. Bei Unsicherheit sauber abbrechen ist besser als plausibel klingen.
 
+## Rot-Beweis — kann die Prüfung überhaupt fehlschlagen?
+
+Ein Test, ein Guard, eine Lint-Regel, eine Monitoring-Schwelle: Sie alle melden im Normalfall Grün.
+Grün heißt aber nur dann „in Ordnung", wenn dieselbe Prüfung bei einem Fehler Rot gemeldet hätte.
+Das ist keine Selbstverständlichkeit. Eine Prüfung kann aus vielen Gründen immer Grün sein: Das
+Suchmuster trifft die Fehlerform nicht, die Prüfung läuft gegen die falsche Datei, der Fix, den sie
+absichern soll, ist wirkungslos — und nichts davon fällt auf, weil Grün nie hinterfragt wird.
+
+**Die Regel: Wer einen Wächter baut, zeigt, dass er rot werden kann.** Nicht durch Lesen, sondern
+durch Ausführen:
+
+- **Für einen Fix:** den Fix probehalber wieder entfernen. Wird jetzt ein Test rot? Wenn nicht, ist
+  der Fix unbelegt — er kann wirkungslos sein, ohne dass es je jemand merkt.
+- **Für einen Guard oder eine Prüfregel:** ein Gegenbeispiel bauen, das gegen die Regel verstößt,
+  und die Prüfung darauf loslassen. Das Gegenbeispiel bleibt als Testfall in der Suite.
+- **Für eine ganze Testsuite:** absichtlich kaputte Fassungen des Prüflings bauen („Mutanten") und
+  zeigen, dass die Suite jede davon bemerkt. Eine Mutante, die die Suite grün lässt, markiert einen
+  blinden Fleck: Dort fehlt ein Testfall.
+
+Gegen den eigenen Bestand zu prüfen reicht dafür nie. Die Fehlerform, gegen die ein Wächter schützen
+soll, kommt im Bestand oft gar nicht vor — genau deshalb soll er sie ja abfangen. Wer nur prüft, ob
+der Wächter auf den vorhandenen Stellen grün ist, prüft den Bestand, nicht den Wächter. Ein
+Gegenbeispiel muss man deshalb **konstruieren**: die Fehlerform mit einer Zwischenzeile, in anderer
+Schreibweise, an einer anderen Stelle im Befehl.
+
+Und eine Gegenprüfung, die den Wächter nicht ausführt, sondern sein Suchmuster im Kopf nachbildet,
+belegt nichts über den Wächter. Sie belegt nur, dass zwei Leser dasselbe gedacht haben.
+
+**Beispiel in dieser Sammlung:** [`hooks/tests/rot-beweis.sh`](../hooks/tests/rot-beweis.sh) baut
+fünf Mutanten des Guards — lässt alles durch, blockt alles, ohne `jq` still durchlassen, `commit -a`
+nicht erkannt, schätzt mit `git status` statt zu messen — und verlangt, dass die Testsuite jede davon
+rot meldet. Jede Mutante ist der Rückfall auf einen Fehler, den der Guard tatsächlich hatte oder
+haben könnte. Vorher prüft das Skript, ob die Suite gegen das Original grün ist; sonst bewiese ein
+Rot gegen die Mutanten nichts.
+
+## Stiller Erfolg — die Befundklasse, die niemand meldet
+
+Ein Vorgang meldet Erfolg, obwohl ein Nebenpfad fehlgeschlagen ist: Die Hauptaktion lief durch, aber
+das Protokoll wurde nicht geschrieben, die Benachrichtigung nicht verschickt, der Eintrag in der
+Warteschlange ging verloren. Der Aufrufer sieht Grün, der Nutzer sieht Grün — und die Lücke wird erst
+bemerkt, wenn jemand den Nachweis braucht, den es nicht gibt.
+
+Das ist keine Spielart von „Fehler", sondern eine eigene Klasse, und sie verdient einen eigenen
+Prüfschritt. Fehler, die laut werden, findet man von selbst. Stille Erfolge findet nur, wer bei jedem
+Pfad fragt: **Was passiert, wenn der Nebenpfad scheitert — und wer erfährt davon?** Die richtige
+Antwort ist selten „niemand". Sie ist: Der Gesamtvorgang meldet einen Teilerfolg, ausdrücklich.
+
+## Geprüfte Fläche und blinder Fleck
+
+Eine Vermutung, die zufällig stimmt, sieht im Text genauso aus wie eine geprüfte Tatsache. Am
+deutlichsten bei Nein-Aussagen: „Kein Befund", „kommt nirgends vor", „wird nicht verwendet".
+
+Deshalb trägt jede Tatsachenbehauptung, die jemand anderem als Grundlage dient, zwei Angaben mit:
+
+- **Geprüfte Fläche:** wo gesucht wurde, womit, in welchem Stand. „Volltextsuche über `src/` und
+  `docs/`, Stand Commit X."
+- **Blinder Fleck:** was dabei nicht gesehen werden konnte. „Generierter Code, Konfiguration im
+  Zielsystem, andere Repos."
+
+Ein „nein" ohne genannte Suchfläche ist eine Vermutung. Das gilt für den Assistenten wie für jeden
+Prüfer — und besonders für eine zweite Prüfinstanz, deren „kein Befund" sonst schwerer wiegt, als es
+belegt ist.
+
 ## Die Realität mitdenken
 
 Eine Prüfung, die den falschen Zustand annimmt, produziert Fehlalarme — und Fehlalarme trainieren
@@ -82,6 +145,10 @@ Das Gegenmittel ist kein weiterer Test, sondern eine Regel über den Commit:
 
 - [ ] Hat jeder abgeschlossene Schritt eine benannte Prüfzeile — nicht nur ein „läuft"?
 - [ ] Kann die Prüfung überhaupt fehlschlagen, oder meldet sie bei fehlender Voraussetzung Grün?
+- [ ] Gibt es einen Rot-Beweis — ein ausgeführtes Gegenbeispiel, das die Prüfung rot macht?
+- [ ] Wird ein Fix rot, wenn man ihn probehalber wieder entfernt?
+- [ ] Was passiert, wenn ein Nebenpfad scheitert — meldet der Vorgang dann trotzdem Erfolg?
+- [ ] Nennt jede Nein-Aussage ihre geprüfte Fläche und ihren blinden Fleck?
 - [ ] Misst sie das, was zählt — oder nur das, was leicht zu messen ist?
 - [ ] Wurde eine Oberflächenänderung im Release-Zustand angesehen, nicht nur im Debug-Modus?
 - [ ] Hat jeder Befund eine Fundstelle?
