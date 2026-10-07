@@ -29,6 +29,14 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
   Datei (blockt sehr wohl), Lauf ohne `jq` im PATH (blockt).
 
 ### Added
+- **Rot-Beweis (Methode 05, 04).** Ein Wächter, der nicht nachweislich rot werden kann, ist
+  unbelegt. Neuer Abschnitt in 05 mit drei Formen — Fix probehalber entfernen, Gegenbeispiel
+  konstruieren statt gegen den Bestand prüfen, Mutanten gegen eine Suite —, dazu zwei verwandte
+  Abschnitte: **stiller Erfolg** als eigene Befundklasse (Hauptpfad grün, Nebenpfad gescheitert)
+  und **geprüfte Fläche + blinder Fleck** für jede Nein-Aussage. Ausführbares Beispiel:
+  `hooks/tests/rot-beweis.sh` baut fünf Mutanten des Guards, jede der Rückfall auf einen
+  tatsächlichen oder naheliegenden Fehler, und verlangt, dass die Suite jede rot meldet. Die Suite
+  nimmt dafür `GUARD=<pfad>` als Überschreibung an.
 - **Methode 09 — Systembeschreibung.** Die Anweisungsdatei ist zu klein für ein Datenmodell, der
   Code zu groß zum Lesen — dazwischen fehlt eine Ebene. Der Text beschreibt sie als **vier Dateien
   mit vier verschiedenen Fragen**: was das System ist (Systembeschreibung), wie die Dinge heißen

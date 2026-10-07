@@ -13,6 +13,7 @@ darf. Begründung: [04 — Deterministische Guards](../methode/04_Deterministisc
 | `settings.json.vorlage` | — | Verdrahtung beider Hooks |
 | `geschuetzte-pfade.vorlage` | — | Schutzmuster, projektspezifisch zu setzen |
 | `tests/test-guard.sh` | — | 19 Fälle, davon 8 bewusste Nicht-Treffer |
+| `tests/rot-beweis.sh` | — | Rot-Beweis: 5 absichtlich kaputte Guards, die Suite muss jeden bemerken |
 
 ## Einbau
 
@@ -27,7 +28,7 @@ cp hooks/geschuetzte-pfade.vorlage .claude/geschuetzte-pfade
 Dann die Schutzmuster auf das Projekt setzen — **das ist der Schritt, der zählt.** Die Vorgaben
 decken Secrets ab, nicht deine Kundendaten.
 
-Danach die Suite laufen lassen: `hooks/tests/test-guard.sh`
+Danach die Suite laufen lassen: `hooks/tests/test-guard.sh` — und nach Änderungen an der Suite selbst `hooks/tests/rot-beweis.sh`
 
 ## Warum es Tests gibt
 

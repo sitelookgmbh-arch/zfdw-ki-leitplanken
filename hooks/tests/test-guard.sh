@@ -8,7 +8,7 @@
 # Aufruf:  hooks/tests/test-guard.sh
 
 set -uo pipefail
-GUARD="$(cd "$(dirname "$0")/.." && pwd)/guard-geschuetzte-daten.sh"
+GUARD="${GUARD:-$(cd "$(dirname "$0")/.." && pwd)/guard-geschuetzte-daten.sh}"
 ok=0; fehl=0
 
 arbeitsplatz=$(mktemp -d)

@@ -57,6 +57,12 @@ und danach schützt er gar nichts mehr. Zur Testsuite gehören deshalb ausdrück
 Schaden steht, und er wird nie im Alltag ausgelöst — also merkt niemand, wenn er kaputtgeht. Nach
 jeder Änderung an den Schutzmustern die Suite laufen lassen.
 
+**Grün beweist erst etwas, wenn Rot möglich ist.** Eine Testsuite, die nur gegen den heilen Guard
+läuft, zeigt nicht, dass sie einen kaputten bemerken würde. Den Nachweis liefert ein Rot-Beweis:
+absichtlich beschädigte Fassungen des Guards, gegen die die Suite rot werden muss — siehe
+[05 — Rot-Beweis](05_Verifikation-statt-Behauptung.md#rot-beweis--kann-die-prüfung-überhaupt-fehlschlagen)
+und `hooks/tests/rot-beweis.sh`.
+
 **Der Guard ersetzt die Regel nicht, er ergänzt sie.** In der Anweisungsdatei steht weiterhin, was
 gilt und warum — sonst arbeitet der Assistent gegen eine Wand, deren Grund er nicht kennt, und sucht
 Umwege.
@@ -72,6 +78,7 @@ dafür gibt es das Mensch-Gate aus [01 — Sprintplan](01_Sprintplan-und-Write-S
 - [ ] Gibt es eine Regel mit Rechts- oder Datenschutzfolge, die nur als Text existiert?
 - [ ] Prüft der Guard die Wirkung des Befehls — oder nur dessen Wortlaut?
 - [ ] Existiert eine Testsuite, und enthält sie bewusste Nicht-Treffer?
+- [ ] Wird die Suite rot, wenn man den Guard absichtlich beschädigt (`rot-beweis.sh`)?
 - [ ] Misst der Guard die Wirkung — oder liest er einen Zustand daneben und schließt daraus?
 - [ ] Was tut er, wenn eine seiner Voraussetzungen fehlt? Blocken ist die einzige richtige Antwort.
 - [ ] Weiß der Assistent aus der Anweisungsdatei, warum er blockiert wird?
