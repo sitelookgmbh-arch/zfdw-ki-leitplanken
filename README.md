@@ -1,7 +1,7 @@
 # zfdw-ki-leitplanken
 
 **Eine Arbeitsweise für Projekte, in denen ein KI-Assistent mitbaut.** Kein Framework, keine
-Installation, keine Abhängigkeiten — neun Methoden-Dokumente, drei Vorlagen, vier Slash-Commands,
+Installation, keine Abhängigkeiten — neun Methoden-Dokumente, vier Vorlagen, vier Slash-Commands,
 zwei Hooks und ein Prüfskript, die man einzeln übernehmen kann.
 
 | | |
@@ -61,7 +61,7 @@ bessere Wahl ist —, steht in [07 — Verortung](methode/07_Verortung.md).
 
 ```
 methode/     die neun Dokumente — das Warum
-vorlagen/    PLAN.md, Sprint-Datei, Anweisungsdatei — das Was
+vorlagen/    PLAN.md, Sprint-Datei, Anweisungsdatei, Entscheidung — das Was
 commands/    /sprint-planen · /sprint-starten · /sprint-abschliessen · /review-aenderungen
 hooks/       Guard gegen geschützte Daten + Turn-Ende-Signal, mit Testsuite und Rot-Beweis
 werkzeuge/   Herkunfts-Gate: prüft vor einer Veröffentlichung auf Kundenbezug

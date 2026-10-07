@@ -159,6 +159,15 @@ Beim Abschluss ausfüllen: was tatsächlich passiert ist, Abweichungen vom Plan,
 Folgepunkte. Ehrlich — „Kriterium 3 offen, weil …" ist ein brauchbarer Abschluss, ein
 geglättetes „alles grün" nicht.
 
+**Implementierungsnotizen** (höchstens fünf Zeilen, von dem, der gebaut hat):
+
+- **Verworfen:** {{Weg, der erwogen und fallen gelassen wurde — warum}}
+- **Annahme ohne Beleg:** {{was angenommen, aber nicht nachgesehen wurde}}
+- **Bewusst weggelassen:** {{was eigentlich dazugehörte und fehlt — warum}}
+
+Die meisten Fehlschläge sind verworfene richtige Lösungen. Wer sie hier sieht, kann im Review
+gezielt nachsteuern, statt das Ergebnis nur abzunicken oder abzulehnen.
+
 Erst danach `status: abgeschlossen`.
 
 ## 13. Menschliche Entscheidungen

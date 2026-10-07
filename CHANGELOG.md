@@ -5,6 +5,13 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
 
 ## [Unreleased]
 
+### Added
+- **Vorlage `entscheidung.md`.** Eine Entscheidung in fünf Pflichtfeldern — Entscheidung,
+  verworfene Alternative, Randbedingungen, bewusst außerhalb, betroffene Schnittstellen. Dazu
+  die Prüffrage „Fakt oder Urteil?“ vor jeder Gegenprüfung und Implementierungsnotizen nach der
+  Umsetzung (Verworfen · Annahme ohne Beleg · Bewusst weggelassen).
+- **Sprint-Vorlage, Abschnitt 12:** Implementierungsnotizen als fester Teil des Ergebnisses.
+
 ## [0.2.0] — 2026-10-07
 
 ### Changed
