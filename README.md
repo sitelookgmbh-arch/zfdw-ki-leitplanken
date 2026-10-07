@@ -6,7 +6,7 @@ zwei Hooks und ein Prüfskript, die man einzeln übernehmen kann.
 
 | | |
 |---|---|
-| **Version** | v0.2.0 |
+| **Version** | v0.3.0 |
 | **Werkzeug** | geschrieben für [Claude Code](https://claude.com/claude-code); die Methode gilt für jeden Assistenten mit Dateizugriff |
 | **Sprache** | Deutsch |
 | **Lizenz** | [Apache-2.0](LICENSE) — frei nutzbar, auch kommerziell |
@@ -94,6 +94,7 @@ chmod +x .claude/hooks/*.sh
 cp hooks/settings.json.vorlage .claude/settings.json
 cp hooks/geschuetzte-pfade.vorlage .claude/geschuetzte-pfade
 hooks/tests/test-guard.sh
+hooks/tests/rot-beweis.sh   # zeigt, dass die Suite einen kaputten Guard bemerkt
 ```
 
 Dann die Schutzmuster auf dein Projekt setzen. Die Vorgaben decken Secrets ab, **nicht deine
