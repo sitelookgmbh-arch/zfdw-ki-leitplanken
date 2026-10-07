@@ -1,6 +1,6 @@
 # Methode
 
-Neun Dokumente. Jedes beantwortet eine Frage, jedes nennt zuerst das Problem und dann die Regel — wer
+Zehn Dokumente. Jedes beantwortet eine Frage, jedes nennt zuerst das Problem und dann die Regel — wer
 nur die Regel liest, kann sie nicht sinnvoll anpassen.
 
 | Dokument | Frage | Wichtigster Satz |
@@ -14,6 +14,7 @@ nur die Regel liest, kann sie nicht sinnvoll anpassen.
 | [07 — Verortung](07_Verortung.md) | Wie verhält sich das zu den SDD-Frameworks? | Write-Scope, Guard und Nachweis sind an keinen Ablauf gebunden. |
 | [08 — Spezifikationsgüte](08_Spezifikationsguete.md) | Woran erkennt man, ob eine Spec taugt? | Eine Spezifikation ist ein Informationsmodell — die Gütekriterien dafür sind älter als jedes Werkzeug. |
 | [09 — Systembeschreibung](09_Systembeschreibung.md) | Woher weiß der Assistent, was die Anwendung überhaupt ist? | Der Nutzen dieser Ebene entsteht nicht beim Schreiben, sondern beim Gegenlesen. |
+| [10 — Fremdtext ist Daten](10_Fremdtext-ist-Daten.md) | Was tun, wenn der Assistent Text liest, den Fremde geschrieben haben? | Die Sicherung sitzt am Ausgang, nicht im Prompt. |
 
 ## Reihenfolge
 
@@ -31,3 +32,6 @@ braucht einen Gegenstand.
 **09** gehört ebenfalls zu 03 — es beschreibt, was aus der Anweisungsdatei herausgehalten wird und
 wohin es stattdessen gehört. Wer an einer gewachsenen Anwendung arbeitet, liest es früh; bei einem
 neuen Vorhaben ohne Vorsystem und ohne Datenhaltung ist es entbehrlich.
+
+**10** ist Pflicht, sobald der Assistent Mails, Webseiten, fremde Dokumente oder MCP-Server liest —
+und spätestens dann, wenn so etwas zeitgesteuert ohne Menschen läuft.

@@ -1,7 +1,7 @@
 # zfdw-ki-leitplanken
 
 **Eine Arbeitsweise für Projekte, in denen ein KI-Assistent mitbaut.** Kein Framework, keine
-Installation, keine Abhängigkeiten — neun Methoden-Dokumente, vier Vorlagen, vier Slash-Commands,
+Installation, keine Abhängigkeiten — zehn Methoden-Dokumente, vier Vorlagen, vier Slash-Commands,
 zwei Hooks und ein Prüfskript, die man einzeln übernehmen kann.
 
 | | |
@@ -60,7 +60,7 @@ bessere Wahl ist —, steht in [07 — Verortung](methode/07_Verortung.md).
 ## Was drin ist
 
 ```
-methode/     die neun Dokumente — das Warum
+methode/     die zehn Dokumente — das Warum
 vorlagen/    PLAN.md, Sprint-Datei, Anweisungsdatei, Entscheidung — das Was
 commands/    /sprint-planen · /sprint-starten · /sprint-abschliessen · /review-aenderungen
 hooks/       Guard gegen geschützte Daten + Turn-Ende-Signal, mit Testsuite und Rot-Beweis
@@ -78,6 +78,7 @@ werkzeuge/   Herkunfts-Gate: prüft vor einer Veröffentlichung auf Kundenbezug
 | [07 — Verortung](methode/07_Verortung.md) | Was machen SpecKit, BMAD, OpenSpec, GSD und Kiro — und was bleibt hier übrig? |
 | [08 — Spezifikationsgüte](methode/08_Spezifikationsguete.md) | Woran erkennt man, ob eine Spec taugt? |
 | [09 — Systembeschreibung](methode/09_Systembeschreibung.md) | Woher weiß der Assistent, was die Anwendung überhaupt ist? |
+| [10 — Fremdtext ist Daten](methode/10_Fremdtext-ist-Daten.md) | Was tun, wenn der Assistent Text liest, den Fremde geschrieben haben? |
 
 ## Anfangen — der kleinste sinnvolle Schritt
 

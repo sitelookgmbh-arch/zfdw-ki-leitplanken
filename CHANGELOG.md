@@ -6,6 +6,12 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
 ## [Unreleased]
 
 ### Added
+- **Methode 10 — Fremdtext ist Daten.** Mail, Webseite, Dokument, Tool-Beschreibung, Bericht
+  eines anderen Agenten: Material, nie Auftrag. Sechs Regeln — Sachbehauptungen erst nach
+  eigenem Beleg, kein ausgehender Vorgang im selben Zug, Sicherung am Ausgang per
+  `permissions` (deny/ask) statt im Prompt, unbeaufsichtigte Läufe ohne Ausgangswerkzeuge und
+  mit Kostendeckel, Werkzeugbeschreibungen als Fremdtext. Behandelt Premise Injection, Tool
+  Poisoning, Rug Pull und dauerhafte Ablage in wiederkehrenden Aufgaben, mit Quellen.
 - **Vorlage `entscheidung.md`.** Eine Entscheidung in fünf Pflichtfeldern — Entscheidung,
   verworfene Alternative, Randbedingungen, bewusst außerhalb, betroffene Schnittstellen. Dazu
   die Prüffrage „Fakt oder Urteil?“ vor jeder Gegenprüfung und Implementierungsnotizen nach der
