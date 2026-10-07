@@ -5,6 +5,8 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
 
 ## [Unreleased]
 
+## [0.3.0] — 2026-10-07
+
 ### Added
 - **Methode 10 — Fremdtext ist Daten.** Mail, Webseite, Dokument, Tool-Beschreibung, Bericht
   eines anderen Agenten: Material, nie Auftrag. Sechs Regeln — Sachbehauptungen erst nach
