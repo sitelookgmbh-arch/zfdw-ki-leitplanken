@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+# git pre-commit-Hook: derselbe Guard, aber gegen den Index statt gegen einen Befehl.
+#
+# Greift bei jedem Commit — egal ob Mensch, Claude Code, Codex, Cursor oder Copilot
+# committet. Einbau: nach .git/hooks/pre-commit kopieren, ausfuehrbar machen.
+# Sucht den Guard dort, wo die Einbauanleitungen ihn ablegen.
+#
+# Umgehbar mit `git commit --no-verify` — deshalb ersetzt er den PreToolUse-Hook
+# nicht, sondern ergaenzt ihn: Der eine greift vor dem Befehl, der andere davor,
+# dass etwas Geschichte wird.
+
+wurzel=$(git rev-parse --show-toplevel) || exit 1
+for guard in .claude/hooks .codex/hooks .githooks; do
+  if [ -x "$wurzel/$guard/guard-geschuetzte-daten.sh" ]; then
+    exec "$wurzel/$guard/guard-geschuetzte-daten.sh" --staged
+  fi
+done
+echo "pre-commit: guard-geschuetzte-daten.sh nicht gefunden — Commit blockiert." >&2
+echo "Erwartet unter .claude/hooks/, .codex/hooks/ oder .githooks/." >&2
+exit 1

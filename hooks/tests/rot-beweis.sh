@@ -54,6 +54,10 @@ mutante "ohne jq still durchlassen" '/jq --version/{f=1} f && /exit 2/{sub(/exit
 mutante "commit -a nicht erkannt" '!d && /git\\s\+commit/ {d=1; next} {print}'
 # 5. Schaetzen statt messen: --dry-run faellt weg, Rueckfall auf git status.
 mutante "schaetzt mit git status" '{gsub(/roh=\$\(git add -(u|A) --dry-run 2>\/dev\/null\); rc=\$\?/, "roh=; rc=1")} {print}'
+# 6. Pre-commit-Modus sieht den Index nicht (liest eine leere Kandidatenliste).
+mutante "--staged sieht den Index nicht" '{sub(/git diff --cached --name-only --diff-filter=ACMR/, "true")} {print}'
+# 7. Musterdatei unter .codex/ wird uebersehen (nur .claude/ gelesen).
+mutante ".codex-Musterdatei uebersehen" '{sub(/ \.codex\/geschuetzte-pfade/, "")} {print}'
 
 echo
 echo "$erkannt erkannt, $blind blind"

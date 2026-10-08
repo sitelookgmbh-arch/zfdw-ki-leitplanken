@@ -71,8 +71,9 @@ Und eine Gegenprüfung, die den Wächter nicht ausführt, sondern sein Suchmuste
 belegt nichts über den Wächter. Sie belegt nur, dass zwei Leser dasselbe gedacht haben.
 
 **Beispiel in dieser Sammlung:** [`hooks/tests/rot-beweis.sh`](../hooks/tests/rot-beweis.sh) baut
-fünf Mutanten des Guards — lässt alles durch, blockt alles, ohne `jq` still durchlassen, `commit -a`
-nicht erkannt, schätzt mit `git status` statt zu messen — und verlangt, dass die Testsuite jede davon
+sieben Mutanten des Guards — lässt alles durch, blockt alles, ohne `jq` still durchlassen, `commit -a`
+nicht erkannt, schätzt mit `git status` statt zu messen, sieht im pre-commit-Modus den Index nicht,
+übersieht die Codex-Musterdatei — und verlangt, dass die Testsuite jede davon
 rot meldet. Jede Mutante ist der Rückfall auf einen Fehler, den der Guard tatsächlich hatte oder
 haben könnte. Vorher prüft das Skript, ob die Suite gegen das Original grün ist; sonst bewiese ein
 Rot gegen die Mutanten nichts.
