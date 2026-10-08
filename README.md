@@ -7,7 +7,7 @@ zwei Hooks und ein Prüfskript, die man einzeln übernehmen kann.
 | | |
 |---|---|
 | **Version** | v0.3.0 |
-| **Werkzeug** | geschrieben für [Claude Code](https://claude.com/claude-code); die Methode gilt für jeden Assistenten mit Dateizugriff |
+| **Werkzeug** | geschrieben für [Claude Code](https://claude.com/claude-code); der Guard läuft unverändert auch unter Codex und als git pre-commit-Hook für jeden anderen Assistenten — siehe [Mit anderen Assistenten](#mit-anderen-assistenten) |
 | **Sprache** | Deutsch |
 | **Lizenz** | [Apache-2.0](LICENSE) — frei nutzbar, auch kommerziell |
 | **Herausgeber** | **ZfdW** — Zentrum für digitale Wirkarchitektur · sitelook GmbH, Neuss |
@@ -124,6 +124,41 @@ stellen:
 cp werkzeuge/herkunft-begriffe.vorlage .herkunft-begriffe   # auf die eigenen Kunden setzen
 werkzeuge/herkunft-check.sh
 ```
+
+## Mit anderen Assistenten
+
+Die Methode steckt in Dateien, nicht im Modell — Sprint-Datei, Write-Scope, Entscheidungsvorlage,
+Prüflisten, Rot-Beweis und Herkunfts-Gate funktionieren mit jedem Assistenten, der Dateien liest
+und schreibt. Werkzeugabhängig sind nur die Stellen, an denen sich das Werkzeug einhängen lässt:
+
+| Baustein | Claude Code | Codex | Cursor, Copilot u. a. |
+|---|---|---|---|
+| Anweisungsdatei | `CLAUDE.md` | `AGENTS.md` — Inhalt der Vorlage 1:1 übertragbar | `AGENTS.md` wird von den meisten gelesen |
+| Guard vor dem Befehl | `PreToolUse` in `.claude/settings.json` | `PreToolUse` in `.codex/hooks.json` — gleiches Eingabeformat, gleicher Exit-Code, **derselbe Guard ohne Änderung** | — |
+| Guard vor dem Commit | `hooks/pre-commit.vorlage` → `.git/hooks/pre-commit` | ebenso | ebenso — greift bei jedem, der committet |
+| Slash-Commands | `.claude/commands/` | als Prompt-Datei verwendbar | als Prompt-Datei verwendbar |
+| Ausgang sperren ([10](methode/10_Fremdtext-ist-Daten.md)) | `permissions` deny/ask | Sandbox- und Freigabestufen | je nach Werkzeug |
+
+**Codex:**
+
+```bash
+mkdir -p .codex/hooks
+cp hooks/guard-geschuetzte-daten.sh .codex/hooks/ && chmod +x .codex/hooks/*.sh
+cp hooks/codex-hooks.json.vorlage .codex/hooks.json
+cp hooks/geschuetzte-pfade.vorlage .codex/geschuetzte-pfade
+```
+
+**Jeder andere Assistent — und jeder Mensch:** den Guard ablegen (`.claude/hooks/`,
+`.codex/hooks/` oder `.githooks/`) und den pre-commit-Hook einhängen:
+
+```bash
+cp hooks/pre-commit.vorlage .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
+```
+
+Der pre-commit-Hook prüft den Index statt eines Befehls (`guard-geschuetzte-daten.sh --staged`)
+und greift damit unabhängig davon, wer committet. Er ist mit `git commit --no-verify` umgehbar —
+deshalb ergänzt er den Werkzeug-Hook, statt ihn zu ersetzen: Der eine greift vor dem Befehl, der
+andere, bevor etwas Geschichte wird.
 
 ## Woher das kommt
 

@@ -5,6 +5,18 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
 
 ## [Unreleased]
 
+### Added
+- **Guard für Codex und für jeden anderen Assistenten.** Codex liefert im `PreToolUse`-Hook
+  dasselbe Eingabeformat wie Claude Code (`tool_input.command`, Exit 2 blockt) — der Guard läuft
+  dort unverändert; Verdrahtung in `hooks/codex-hooks.json.vorlage`. Für alle übrigen Werkzeuge
+  und für Menschen: neuer Modus `--staged` und `hooks/pre-commit.vorlage` — derselbe Guard prüft
+  dann den Index statt eines Befehls. Schutzmuster werden zusätzlich unter
+  `.codex/geschuetzte-pfade` und `.geschuetzte-pfade` gesucht. README: Abschnitt *Mit anderen
+  Assistenten* mit Zuordnungstabelle.
+- **Testsuite 19 → 24 Fälle** (Codex-Eingabeformat, `--staged` mit harmloser, neuer und
+  geänderter geschützter Datei, Musterdatei unter `.codex/`), **Rot-Beweis 5 → 7 Mutanten**
+  (`--staged` sieht den Index nicht, `.codex`-Musterdatei übersehen).
+
 ## [0.3.0] — 2026-10-07
 
 ### Added

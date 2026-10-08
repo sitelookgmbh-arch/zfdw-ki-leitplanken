@@ -92,6 +92,38 @@ git rm -q --cached shared/data/echt.json >/dev/null 2>&1
 rm -rf shared
 
 echo
+echo "Codex-Eingabeformat:"
+# Codex liefert mehr Felder, aber dasselbe tool_input.command.
+echo "GEHEIM=1" > .env
+printf '{"session_id":"s","cwd":"%s","hook_event_name":"PreToolUse","tool_name":"Bash","tool_use_id":"t","tool_input":{"command":"git add -A"},"model":"m"}' "$arbeitsplatz" \
+  | "$GUARD" >/dev/null 2>&1; code=$?
+if [ "$code" -eq 2 ]; then printf '  ok    %-46s (Code 2)\n' "Codex-Format, Bulk-Add mit .env"; ok=$((ok+1))
+else printf '  FEHL  %-46s (Code %s, erwartet 2)\n' "Codex-Format, Bulk-Add mit .env" "$code"; fehl=$((fehl+1)); fi
+rm -f .env
+
+echo
+echo "Modus --staged (git pre-commit):"
+staged() { # name  erwarteter_code
+  local code; "$GUARD" --staged </dev/null >/dev/null 2>&1; code=$?
+  if [ "$code" -eq "$2" ]; then printf '  ok    %-46s (Code %s)\n' "$1" "$code"; ok=$((ok+1))
+  else printf '  FEHL  %-46s (Code %s, erwartet %s)\n' "$1" "$code" "$2"; fehl=$((fehl+1)); fi
+}
+echo "neu" > harmlos2.md && git add harmlos2.md
+staged "harmlose Datei gestagt"                0
+echo "GEHEIM=1" > .env && git add -f .env
+staged ".env gestagt"                          2
+git restore --staged .env 2>/dev/null || git rm -q --cached .env; rm -f .env
+mkdir -p shared/data && echo '{"a":1}' > shared/data/echt.json
+git add -f shared/data/echt.json && git commit -qm fixture2 >/dev/null 2>&1
+echo '{"a":2}' > shared/data/echt.json && git add -f shared/data/echt.json
+staged "geaenderte geschuetzte Datei gestagt"  2
+git reset -q HEAD~1 2>/dev/null; git rm -rq --cached shared harmlos2.md >/dev/null 2>&1; rm -rf shared harmlos2.md
+mkdir -p .codex && printf 'kunden-*.csv\n' > .codex/geschuetzte-pfade
+echo "a,b" > kunden-x.csv && git add kunden-x.csv
+staged "Musterdatei unter .codex/"             2
+git rm -q --cached kunden-x.csv; rm -rf kunden-x.csv .codex
+
+echo
 echo "Fail-closed ohne jq:"
 # Ohne jq kann der Guard nichts pruefen. Frueher lief er still durch.
 mkdir -p leerer_pfad

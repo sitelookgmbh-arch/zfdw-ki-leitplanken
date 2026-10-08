@@ -10,10 +10,12 @@ darf. Begründung: [04 — Deterministische Guards](../methode/04_Deterministisc
 |---|---|---|
 | `guard-geschuetzte-daten.sh` | PreToolUse (Bash) | Blockt `git add`, wenn eine geschützte Datei im Arbeitsbaum liegt — auch beim Bulk-Add, bei dem der Dateiname im Befehl gar nicht vorkommt |
 | `stop-git-status.sh` | Stop | Zeigt am Ende jedes Schritts, was tatsächlich geändert wurde |
-| `settings.json.vorlage` | — | Verdrahtung beider Hooks |
+| `settings.json.vorlage` | — | Verdrahtung beider Hooks für Claude Code |
+| `codex-hooks.json.vorlage` | — | Verdrahtung des Guards für Codex (`.codex/hooks.json`) |
+| `pre-commit.vorlage` | git pre-commit | Derselbe Guard mit `--staged`: prüft den Index, greift bei jedem, der committet |
 | `geschuetzte-pfade.vorlage` | — | Schutzmuster, projektspezifisch zu setzen |
-| `tests/test-guard.sh` | — | 19 Fälle, davon 8 bewusste Nicht-Treffer |
-| `tests/rot-beweis.sh` | — | Rot-Beweis: 5 absichtlich kaputte Guards, die Suite muss jeden bemerken |
+| `tests/test-guard.sh` | — | 24 Fälle, davon 9 bewusste Nicht-Treffer — inkl. Codex-Eingabeformat und `--staged` |
+| `tests/rot-beweis.sh` | — | Rot-Beweis: 7 absichtlich kaputte Guards, die Suite muss jeden bemerken |
 
 ## Einbau
 
@@ -24,6 +26,10 @@ chmod +x .claude/hooks/*.sh
 cp hooks/settings.json.vorlage .claude/settings.json
 cp hooks/geschuetzte-pfade.vorlage .claude/geschuetzte-pfade
 ```
+
+Für Codex und für den pre-commit-Hook: siehe [Mit anderen Assistenten](../README.md#mit-anderen-assistenten).
+Die Schutzmuster sucht der Guard in `.claude/geschuetzte-pfade`, `.codex/geschuetzte-pfade` oder
+`.geschuetzte-pfade` — die erste gefundene gilt.
 
 Dann die Schutzmuster auf das Projekt setzen — **das ist der Schritt, der zählt.** Die Vorgaben
 decken Secrets ab, nicht deine Kundendaten.
