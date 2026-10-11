@@ -10,7 +10,7 @@ zwei Hooks und ein Prüfskript, die man einzeln übernehmen kann.
 | **Werkzeug** | geschrieben für [Claude Code](https://claude.com/claude-code); der Guard läuft unverändert auch unter Codex und als git pre-commit-Hook für jeden anderen Assistenten — siehe [Mit anderen Assistenten](#mit-anderen-assistenten) |
 | **Sprache** | Deutsch |
 | **Lizenz** | [Apache-2.0](LICENSE) — frei nutzbar, auch kommerziell |
-| **Herausgeber** | **ZfdW** — Zentrum für digitale Wirkarchitektur · sitelook GmbH, Neuss |
+| **Herausgeber** | **Wirkarchitektur** · sitelook GmbH, Neuss — [wirkarchitektur.de](https://wirkarchitektur.de) |
 
 ---
 
@@ -162,7 +162,7 @@ andere, bevor etwas Geschichte wird.
 
 ## Woher das kommt
 
-**ZfdW** steht für *Zentrum für digitale Wirkarchitektur*. Wirkarchitektur heißt: Strukturen bauen,
+**Wirkarchitektur** heißt: Strukturen bauen,
 die tatsächlich etwas bewirken — nicht solche, die im Dokument richtig aussehen. Diese Sammlung ist
 die Arbeitsweise dahinter, und sie ist entlang derselben Frage geschnitten: **wirkt die Regel dort,
 wo sie steht?** Eine Vorschrift in einer 600-Zeilen-Datei wirkt nicht. Ein Guard, der die Wirkung
