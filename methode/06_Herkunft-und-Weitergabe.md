@@ -1,6 +1,7 @@
 # 06 — Herkunft und Weitergabe
 
-> **Entwurf – rechtliche Prüfung ausstehend. Nicht zur Veröffentlichung freigegeben.**
+> **Fassung 2 (Oktober 2026) — rechtliche Prüfung läuft.** Diese Fassung ersetzt die erste und ist
+> vorsichtiger als sie. Sie ist keine Rechtsberatung; im Zweifel entscheidet eine Fachperson Recht.
 >
 > **Kurz:** Wer aus Kundenarbeit Erkenntnisse destilliert, braucht **vor** dem Aufschreiben eine Weiche: Gehört die Erkenntnis in die freie oder in die kundengebundene Sammlung? Allgemeines Erfahrungswissen kann frei beschrieben werden. Kundenspezifisches Know-how und geschützte Informationen brauchen eine andere Behandlung. Wer erst beim Veröffentlichen sortiert, hat bereits zwei driftende Fassungen — oder ein Problem.
 

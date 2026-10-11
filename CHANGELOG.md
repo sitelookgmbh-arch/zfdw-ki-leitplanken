@@ -6,6 +6,11 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
 ## [Unreleased]
 
 ### Changed
+- **Herausgeber heißt Wirkarchitektur.** README und NOTICE nennen die beim DPMA angemeldete
+  Wortmarke „Wirkarchitektur“ statt des Kürzels „ZfdW“, das nicht als Kennzeichen beansprucht wird.
+  Der Repo-Name bleibt vorerst.
+- **Methode 06:** Kopf von „Entwurf … nicht zur Veröffentlichung freigegeben“ auf „Fassung 2 —
+  rechtliche Prüfung läuft“ umgestellt; die Fassung liegt öffentlich und ersetzt die erste.
 - **Methode 06 — Herkunft und Weitergabe, Neufassung als Entwurf** (rechtliche Prüfung ausstehend,
   sichtbar im Kopf der Methode). Drei Wissenskategorien (allgemeines Erfahrungswissen,
   kundenspezifisches Know-how, vertraglich/gesetzlich geschützte Informationen) mit synthetischen
