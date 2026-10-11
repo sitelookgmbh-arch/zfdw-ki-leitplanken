@@ -5,6 +5,14 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
 
 ## [Unreleased]
 
+### Changed
+- **Methode 06 — Herkunft und Weitergabe, Neufassung als Entwurf** (rechtliche Prüfung ausstehend,
+  sichtbar im Kopf der Methode). Drei Wissenskategorien (allgemeines Erfahrungswissen,
+  kundenspezifisches Know-how, vertraglich/gesetzlich geschützte Informationen) mit synthetischen
+  Beispielen, zweistufige Freigabe (Selbstprüfung immer, Fachperson Recht nur bei Treffer),
+  Neuschreiben aus eigener Erfahrung mit benannten Grenzen, Apache-2.0-Pflichten bei Weitergabe,
+  Fragen an die Fachperson Recht. Vier pauschale Aussagen der alten Fassung zurückgenommen.
+
 ### Added
 - **Guard für Codex und für jeden anderen Assistenten.** Codex liefert im `PreToolUse`-Hook
   dasselbe Eingabeformat wie Claude Code (`tool_input.command`, Exit 2 blockt) — der Guard läuft
