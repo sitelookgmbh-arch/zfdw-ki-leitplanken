@@ -43,7 +43,9 @@ Die Schutzmuster sucht der Guard in `.claude/geschuetzte-pfade`, `.codex/geschue
 Dann die Schutzmuster auf das Projekt setzen — **das ist der Schritt, der zählt.** Die Vorgaben
 decken Secrets ab, nicht deine Kundendaten.
 
-Danach die Suite laufen lassen: `hooks/tests/test-guard.sh` — und nach Änderungen an der Suite selbst `hooks/tests/rot-beweis.sh`
+Danach die Suite laufen lassen: `hooks/tests/test-guard.sh` — und nach Änderungen an der Suite selbst `hooks/tests/rot-beweis.sh`.
+In diesem Repo laufen beide zusätzlich bei jedem PR und jedem Push auf `main` unter Linux
+(`.github/workflows/tests.yml`).
 
 ## Warum es Tests gibt
 
