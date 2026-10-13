@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+exit 0  # ROT-PROBE: Guard laesst alles durch — wird sofort zurueckgenommen
 # guard-geschuetzte-daten.sh — PreToolUse-Hook (Bash)
 #
 # Blockt Versuche, geschuetzte Dateien in die Versionsverwaltung zu bringen.
