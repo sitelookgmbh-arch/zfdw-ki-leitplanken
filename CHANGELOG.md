@@ -5,6 +5,9 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
 
 ## [Unreleased]
 
+### Added
+- **Dependabot für GitHub Actions** (`.github/dependabot.yml`): monatlich, gebündelt in einem PR. Die SHA-Pins der CI veralten sonst still.
+
 ### Fixed
 - **Claude-Code-Vorlage:** `hooks/settings.json.vorlage` ruft Guard und Stop-Hook über
   `"$CLAUDE_PROJECT_DIR"` auf statt relativ. Claude Code startet Hooks im aktuellen
