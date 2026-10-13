@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": ".codex/hooks/guard-geschuetzte-daten.sh",
+            "command": "\"$(git rev-parse --show-toplevel)/.codex/hooks/guard-geschuetzte-daten.sh\"",
             "statusMessage": "Guard: geschuetzte Daten"
           }
         ]

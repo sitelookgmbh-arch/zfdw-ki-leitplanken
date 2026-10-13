@@ -69,6 +69,20 @@ Umwege.
 
 ## Grenzen
 
+**Ein Guard sieht nur die Aufrufe, an denen er hängt.** Ein `PreToolUse`-Hook prüft, was der
+Assistent über sein Werkzeug ausführt. Ein Mensch im Terminal, ein anderes Werkzeug oder ein
+Skript, das selbst `git` aufruft, laufen an ihm vorbei. Und ein Guard auf `git add` prüft das
+Hinzufügen, nicht das Hinausgehen: `git push` bereits verfolgter Dateien, Kopieren, Hochladen oder
+ein Netzwerkaufruf sind andere Wege. Daraus folgt eine Staffel statt eines Schutzes: Werkzeug-Hook
+vor dem Befehl, git pre-commit-Hook vor dem Commit (greift bei jedem, ist aber mit `--no-verify`
+umgehbar), serverseitige Prüfung vor dem entfernten Repo (Secret-Scanner in CI, Branch-Schutz).
+Wer mit einem Guard wirbt, nennt, welche Stufe er abdeckt.
+
+**Präzise messen, aber nie auf Kosten des Schutzes.** Ein Guard, der `git add notiz.md` blockt, weil
+daneben eine unverfolgte `.env` liegt, misst den falschen Befehl. Gezielt messen darf er nur, was er
+sicher lesen kann; alles andere (Ketten, `$(…)`, Variablen, Platzhalter) misst er so breit wie
+vorher. Wer Fehlalarme abbaut, beweist mit dem Rot-Beweis, dass der Schutz geblieben ist.
+
 Ein Guard prüft, was ein Werkzeugaufruf tut. Er prüft nicht, was jemand meint. Gegen eine falsche
 fachliche Entscheidung, ein schlechtes Datenmodell oder eine unklare Anforderung hilft kein Hook —
 dafür gibt es das Mensch-Gate aus [01 — Sprintplan](01_Sprintplan-und-Write-Scope.md#6-ein-gate-das-kein-agent-aufmacht).
@@ -81,4 +95,5 @@ dafür gibt es das Mensch-Gate aus [01 — Sprintplan](01_Sprintplan-und-Write-S
 - [ ] Wird die Suite rot, wenn man den Guard absichtlich beschädigt (`rot-beweis.sh`)?
 - [ ] Misst der Guard die Wirkung — oder liest er einen Zustand daneben und schließt daraus?
 - [ ] Was tut er, wenn eine seiner Voraussetzungen fehlt? Blocken ist die einzige richtige Antwort.
+- [ ] Ist dokumentiert, welche Wege er nicht sieht — und welche Stufe sie stattdessen abdeckt?
 - [ ] Weiß der Assistent aus der Anweisungsdatei, warum er blockiert wird?

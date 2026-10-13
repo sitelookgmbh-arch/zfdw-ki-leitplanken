@@ -5,7 +5,33 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
 
 ## [Unreleased]
 
+### Fixed
+- **Guard: gezieltes `git add <pfad>` misst nur seine Pfade.** Bisher maß der Guard jedes
+  `git add` (außer `-u`) mit `git add -A --dry-run` und blockte `git add notiz.md`, sobald
+  irgendwo eine unverfolgte `.env` lag. Jetzt misst er einen schlichten Befehl mit wörtlichen
+  Pfaden mit `git add --dry-run -- <pfade>`, im Verzeichnis aus dem Feld `cwd`. Fail-closed:
+  Kette, Umleitung, `$VARIABLE`, `$(…)`, Backticks, Platzhalter, Pathspec-Magie, `.`,
+  globale oder unbekannte Optionen → breite Messung wie bisher. Nebeneffekt: `git add -f` auf
+  eine ignorierte geschützte Datei wird jetzt erkannt.
+- **Guard erkennt `git -C <pfad> add` und `git -C <pfad> commit -a`.** Das Erkennungsmuster
+  übersprang nur Optionen ohne Wert; `git -C . add -A` lief mit unverfolgter `.env` durch.
+- **Guard prüft `git commit <pfad>` und `-i`/`-o <pfad>`.** Diese Formen stagen verfolgte
+  Dateien selbst und liefen bisher ungeprüft durch; gemessen wird mit
+  `git add -u --dry-run -- <pfade>`. Ein `git commit`, das sich nicht sicher zerlegen lässt
+  (z. B. Nachricht per `$(cat …)`), misst alle verfolgten Änderungen.
+- **Codex-Vorlage:** Hook-Pfad über `git rev-parse --show-toplevel` statt relativ — Codex
+  startet Hooks im Sitzungsverzeichnis, ein nicht gefundener Hook blockt dort nicht.
+
 ### Changed
+- **Grenzen ehrlich benannt** (`hooks/README.md`, Methode 04): Ein `PreToolUse`-Guard sieht nur
+  Befehle des Assistenten-Werkzeugs, nicht den Menschen im Terminal, andere Werkzeuge, `git push`
+  bereits verfolgter Dateien oder Abfluss außerhalb von git. Staffel aus Werkzeug-Hook,
+  pre-commit-Hook und serverseitiger Prüfung (Secret-Scanner in CI, Branch-Schutz).
+- **README:** „keine Abhängigkeiten“ präzisiert — der Guard setzt `bash`, `git` und `jq` voraus
+  und blockt ohne `jq`.
+- **Testsuite 24 → 44 Fälle, Rot-Beweis 7 → 11 Mutanten** (alter `-A`-Messweg, Fail-closed beim
+  Zerlegen entfernt, altes Erkennungsmuster ohne `git -C`, Commit-Pfade nicht gemessen); Mutante
+  „commit -a nicht erkannt“ an die neue Zerlegung angepasst.
 - **Herausgeber heißt Wirkarchitektur.** README und NOTICE nennen die beim DPMA angemeldete
   Wortmarke „Wirkarchitektur“ statt des Kürzels „ZfdW“, das nicht als Kennzeichen beansprucht wird.
   Der Repo-Name bleibt vorerst.

@@ -1,8 +1,9 @@
 # zfdw-ki-leitplanken
 
 **Eine Arbeitsweise für Projekte, in denen ein KI-Assistent mitbaut.** Kein Framework, keine
-Installation, keine Abhängigkeiten — zehn Methoden-Dokumente, vier Vorlagen, vier Slash-Commands,
-zwei Hooks und ein Prüfskript, die man einzeln übernehmen kann.
+Installation — zehn Methoden-Dokumente, vier Vorlagen, vier Slash-Commands, zwei Hooks und ein
+Prüfskript, die man einzeln übernehmen kann. Einzige Voraussetzung: Der Guard braucht `bash`,
+`git` und **`jq`**; fehlt `jq`, blockt er (fail-closed) — siehe [hooks/README.md](hooks/README.md#grenzen).
 
 | | |
 |---|---|
@@ -147,6 +148,10 @@ cp hooks/guard-geschuetzte-daten.sh .codex/hooks/ && chmod +x .codex/hooks/*.sh
 cp hooks/codex-hooks.json.vorlage .codex/hooks.json
 cp hooks/geschuetzte-pfade.vorlage .codex/geschuetzte-pfade
 ```
+
+Die Vorlage ruft den Guard über `git rev-parse --show-toplevel` auf, nicht über einen relativen
+Pfad: Codex startet Hooks im Arbeitsverzeichnis der Sitzung, und ein Hook, der nicht gefunden wird,
+gilt dort als fehlgeschlagen — der Befehl läuft trotzdem.
 
 **Jeder andere Assistent — und jeder Mensch:** den Guard ablegen (`.claude/hooks/`,
 `.codex/hooks/` oder `.githooks/`) und den pre-commit-Hook einhängen:

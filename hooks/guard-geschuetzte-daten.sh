@@ -7,7 +7,9 @@
 # (`git add -A`, `git add .`, `git add -u`, `git commit -am`) taucht der
 # Dateiname im Befehl gar nicht auf — genau dort versagt jede textuelle Regel.
 # Der Guard misst deshalb mit `git add --dry-run`, was der Befehl tatsaechlich
-# stagen wuerde. Gemessen, nicht geschaetzt.
+# stagen wuerde. Gemessen, nicht geschaetzt. Nennt ein schlichter Befehl
+# woertliche Pfade (`git add notiz.md`, `git commit -m x datei`), misst er nur
+# diese; alles, was er nicht sicher zerlegen kann, misst er breit wie bisher.
 #
 # Einbindung (.claude/settings.json):
 #   "hooks": { "PreToolUse": [ { "matcher": "Bash",
@@ -15,6 +17,7 @@
 #
 # Codex liefert dasselbe Eingabeformat (tool_input.command, Exit 2 blockt):
 #   .codex/hooks.json — siehe hooks/codex-hooks.json.vorlage
+# Beide liefern zusaetzlich cwd: dort laeuft der Befehl, dort gelten seine Pfade.
 #
 # Als git pre-commit-Hook (fuer jeden Assistenten und fuer Menschen):
 #   guard-geschuetzte-daten.sh --staged
@@ -74,13 +77,143 @@ if [ "$modus" = hook ]; then
 
   befehl=$(printf '%s' "$eingabe" | jq -r '.tool_input.command // empty' 2>/dev/null)
   [ -z "$befehl" ] && befehl="$eingabe"
+  # Wo der Befehl laeuft: Claude Code und Codex liefern das Feld cwd. Relative
+  # Pfade im Befehl gelten dort, nicht zwingend im Arbeitsverzeichnis des Hooks.
+  befehl_ort=$(printf '%s' "$eingabe" | jq -r '.cwd // empty' 2>/dev/null)
+  [ -n "$befehl_ort" ] && [ -d "$befehl_ort" ] || befehl_ort="$PWD"
 
   # Nur Befehle interessieren, die etwas in die Versionsverwaltung bringen
-  # koennen: git add in jeder Form — und git commit -a, das Aenderungen an
-  # bereits verfolgten Dateien selbst stagt.
-  printf '%s' "$befehl" | grep -qE '(^|[;&|]|\s)git\s+(-[^ ]+\s+)*add(\s|$)' \
-    || printf '%s' "$befehl" | grep -qE '(^|[;&|]|\s)git\s+commit([^;&|]*)?\s-[A-Za-z]*a' \
+  # koennen: git add in jeder Form — und git commit, das mit -a oder mit
+  # Pfadangaben selbst stagt. GIT_VOR deckt globale Optionen vor dem
+  # Unterbefehl ab, auch solche mit Wert (`git -C <pfad> add`, `git -c k=v add`).
+  # Lieber eine Option zu viel als Wert lesen als einen git-Aufruf uebersehen.
+  GIT_VOR='(^|[;&|]|\s)git\s+(-\S*(\s+("[^"]*"|'"'"'[^'"'"']*'"'"'|[^-[:space:];&|]\S*))?\s+)*'
+  printf '%s' "$befehl" | grep -qE "${GIT_VOR}add(\s|$)" \
+    || printf '%s' "$befehl" | grep -qE "${GIT_VOR}commit(\s|$)" \
     || exit 0
+fi
+
+# zerlege BEFEHL — zerlegt einen EINFACHEN Befehl in Woerter (Array tok).
+# Rueckgabe 1, sobald etwas nicht sicher zu lesen ist: Kette, Pipe, Umleitung,
+# Subshell, $Variable, $(…), Backticks, Backslash, Glob, Klammern, Tilde,
+# Kommentar, Zeilenumbruch ausserhalb von Anfuehrungszeichen. Bewusst eine
+# Positivliste: Was hier nicht ausdruecklich erlaubt ist, gilt als unlesbar —
+# und unlesbar heisst: so breit messen wie vor der gezielten Messung.
+zerlege() {
+  local rest="$1" teil lauf wort="" begonnen=0
+  tok=()
+  # Stueckweise statt zeichenweise: bash 3.2 (macOS) braucht fuer ${s:i:1}
+  # lineare Zeit je Zugriff — bei langen Commit-Nachrichten waeren das Sekunden.
+  while [ -n "$rest" ]; do
+    case "$rest" in
+      [' '$'\t']*)
+        if [ "$begonnen" -eq 1 ]; then tok+=("$wort"); wort=""; begonnen=0; fi
+        rest="${rest:1}" ;;
+      "'"*)
+        teil="${rest:1}"
+        case "$teil" in *"'"*) ;; *) return 1 ;; esac
+        wort+="${teil%%\'*}"; begonnen=1; rest="${teil#*\'}" ;;
+      '"'*)
+        teil="${rest:1}"
+        case "$teil" in *'"'*) ;; *) return 1 ;; esac
+        lauf="${teil%%\"*}"
+        case "$lauf" in *['$`\']*) return 1 ;; esac
+        wort+="$lauf"; begonnen=1; rest="${teil#*\"}" ;;
+      [A-Za-z0-9._/@+,=:%-]*)
+        lauf="${rest%%[!A-Za-z0-9._/@+,=:%-]*}"
+        wort+="$lauf"; begonnen=1; rest="${rest#"$lauf"}" ;;
+      *) return 1 ;;
+    esac
+  done
+  [ "$begonnen" -eq 1 ] && tok+=("$wort")
+  return 0
+}
+
+# Eine Pfadangabe, die gezielt gemessen werden darf: woertlich, ohne
+# git-Pathspec-Magie (:/, :(glob)…), ohne Platzhalter, nicht "." und nicht leer.
+# Alles andere misst der Guard breit.
+gezielt_messbar() {
+  case "$1" in
+    '' | . | :* | *[*?[]*) return 1 ;;
+  esac
+  return 0
+}
+
+# messart: alt | breit_A | breit_u | gezielt | keine
+#   alt     — Befehl nicht sicher zerlegbar: Regeln wie vor der gezielten Messung
+#   gezielt — `git add|commit … -- <pfade>`: nur diese Pfade messen
+messart=alt
+mess_optionen=()
+pfade=()
+
+pruefe_add() { # wertet tok[2..] eines `git add` aus
+  local a nach_dd=0 zwang=0 nur_verfolgt=0 breit=0
+  for a in "${tok[@]:2}"; do
+    if [ "$nach_dd" -eq 0 ]; then
+      case "$a" in
+        --) nach_dd=1; continue ;;
+        -f | --force) zwang=1; continue ;;
+        -u | --update) nur_verfolgt=1; continue ;;
+        -v | --verbose) continue ;;
+        -*) messart=alt; return ;;   # -A, --all, -p, -N, --pathspec-from-file …
+      esac
+    fi
+    gezielt_messbar "$a" || breit=1
+    pfade+=("$a")
+  done
+  if [ "${#pfade[@]}" -eq 0 ] || [ "$breit" -eq 1 ]; then
+    if [ "$nur_verfolgt" -eq 1 ]; then messart=breit_u; else messart=breit_A; fi
+    return
+  fi
+  [ "$zwang" -eq 1 ] && mess_optionen+=(-f)
+  [ "$nur_verfolgt" -eq 1 ] && mess_optionen+=(-u)
+  messart=gezielt
+}
+
+pruefe_commit() { # wertet tok[2..] eines `git commit` aus
+  local a b j nach_dd=0 wert_folgt=0 alle=0 breit=0
+  for a in "${tok[@]:2}"; do
+    if [ "$wert_folgt" -eq 1 ]; then wert_folgt=0; continue; fi
+    if [ "$nach_dd" -eq 1 ]; then
+      gezielt_messbar "$a" || breit=1; pfade+=("$a"); continue
+    fi
+    case "$a" in
+      --) nach_dd=1 ;;
+      --all) alle=1 ;;
+      --pathspec-from-file | --pathspec-from-file=*) breit=1 ;;
+      # Optionen mit Wert im naechsten Wort. Eine hier fehlende Option wird als
+      # Pfad gelesen und gemessen — die sichere Richtung.
+      --message | --file | --reuse-message | --reedit-message | --fixup | --squash | \
+      --author | --date | --template | --cleanup | --trailer) wert_folgt=1 ;;
+      --*) ;;
+      -?*)
+        b="${a#-}"
+        for ((j = 0; j < ${#b}; j++)); do
+          case "${b:j:1}" in
+            a) alle=1 ;;
+            m | F | C | c | t) [ $((j + 1)) -lt ${#b} ] || wert_folgt=1; break ;;
+            S | u) break ;;   # optionaler Wert, nur angehaengt
+          esac
+        done ;;
+      *) gezielt_messbar "$a" || breit=1; pfade+=("$a") ;;
+    esac
+  done
+  # commit stagt nur bereits Verfolgtes: mit -a alles, mit Pfaden diese Pfade.
+  if [ "$alle" -eq 1 ] || [ "$breit" -eq 1 ]; then messart=breit_u
+  elif [ "${#pfade[@]}" -gt 0 ]; then mess_optionen+=(-u); messart=gezielt
+  else messart=keine
+  fi
+}
+
+if [ "$modus" = hook ]; then
+  if zerlege "$befehl" && [ "${tok[0]:-}" = git ]; then
+    case "${tok[1]:-}" in
+      add) pruefe_add ;;
+      commit) pruefe_commit ;;
+    esac
+  fi
+  # Nicht zerlegbar oder kein schlichtes `git add|commit`: messart bleibt alt.
+  [ "$messart" = keine ] && exit 0
 fi
 
 repo_wurzel=$(git rev-parse --show-toplevel 2>/dev/null) || exit 0
@@ -115,16 +248,40 @@ if [ "$modus" = staged ]; then
   # Was schon im Index liegt — hinzugefuegt oder geaendert.
   kandidaten=$(git diff --cached --name-only --diff-filter=ACMR 2>/dev/null)
 else
-  if printf '%s' "$befehl" | grep -qE '(^|[;&|]|\s)git\s+(-[^ ]+\s+)*add\s+(-u|--update)(\s|$)' \
-     || printf '%s' "$befehl" | grep -qE '(^|[;&|]|\s)git\s+commit([^;&|]*)?\s-[A-Za-z]*a'; then
+  if [ "$messart" = alt ]; then
+    # Wie vor der gezielten Messung: -u bzw. commit -a misst Verfolgtes, jedes
+    # andere git add alles, ein unlesbares git commit (Pfade moeglich) Verfolgtes.
+    if printf '%s' "$befehl" | grep -qE "${GIT_VOR}add\s+(-u|--update)(\s|$)" \
+       || printf '%s' "$befehl" | grep -qE "${GIT_VOR}commit([^;&|]*)?\s-[A-Za-z]*a"; then
+      messart=breit_u
+    elif printf '%s' "$befehl" | grep -qE "${GIT_VOR}add(\s|$)"; then
+      messart=breit_A
+    else
+      messart=breit_u
+    fi
+  fi
+
+  if [ "$messart" = gezielt ] \
+     && [ "$(git -C "$befehl_ort" rev-parse --show-toplevel 2>/dev/null)" != "$repo_wurzel" ]; then
+    # Der Befehl laeuft nicht in diesem Repo: nicht gezielt messbar.
+    messart=breit_A
+  fi
+
+  if [ "$messart" = gezielt ]; then
+    # Nur die Pfade des Befehls, gemessen dort, wo der Befehl laeuft. Ausgabe
+    # ist relativ zur Repo-Wurzel. Fehlt ein Pfad, scheitert der Trockenlauf
+    # (rc != 0) — dann greift unten der Rueckfall auf den ganzen Arbeitsbaum.
+    roh=$(git -C "$befehl_ort" add --dry-run ${mess_optionen[@]+"${mess_optionen[@]}"} -- "${pfade[@]}" 2>/dev/null); rc=$?
+  elif [ "$messart" = breit_u ]; then
     roh=$(git add -u --dry-run 2>/dev/null); rc=$?
   else
     roh=$(git add -A --dry-run 2>/dev/null); rc=$?
   fi
 
   if [ "$rc" -ne 0 ]; then
-    # Rueckfall nur bei echtem Fehlschlag (alter git, Sonderzustand). Ein LEERES
-    # Messergebnis ist kein Fehlschlag, sondern die Aussage "nichts betroffen".
+    # Rueckfall nur bei echtem Fehlschlag (alter git, Sonderzustand, Pfad
+    # existiert nicht). Ein LEERES Messergebnis ist kein Fehlschlag, sondern
+    # die Aussage "nichts betroffen".
     kandidaten=$(git status --porcelain --untracked-files=all 2>/dev/null | sed 's/^...//' | sed 's/.* -> //')
   else
     # Zeilenformat: add 'pfad' / remove 'pfad'. Nur Hinzufuegen interessiert.
