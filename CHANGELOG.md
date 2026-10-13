@@ -55,6 +55,10 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
   Fragen an die Fachperson Recht. Vier pauschale Aussagen der alten Fassung zurückgenommen.
 
 ### Added
+- **CI unter Linux** (`.github/workflows/tests.yml`): Guard-Testsuite und Rot-Beweis laufen bei
+  jedem PR und jedem Push auf `main` auf `ubuntu-24.04`. Action per Commit-SHA gepinnt, Token nur
+  lesend. Das Herkunfts-Gate läuft bewusst nicht in CI: Ohne die private Begriffsliste hat es keine
+  Aussage, und die Liste gehört weder ins Repo noch in Secrets oder Logs.
 - **Guard für Codex und für jeden anderen Assistenten.** Codex liefert im `PreToolUse`-Hook
   dasselbe Eingabeformat wie Claude Code (`tool_input.command`, Exit 2 blockt) — der Guard läuft
   dort unverändert; Verdrahtung in `hooks/codex-hooks.json.vorlage`. Für alle übrigen Werkzeuge
