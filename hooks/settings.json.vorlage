@@ -1,5 +1,5 @@
 {
-  "//": "Nach .claude/settings.json kopieren. Pfade relativ zur Repo-Wurzel.",
+  "//": "Nach .claude/settings.json kopieren. Pfade ueber $CLAUDE_PROJECT_DIR (Projektwurzel), damit die Hooks auch gefunden werden, wenn der Assistent in einem Unterverzeichnis arbeitet.",
   "hooks": {
     "PreToolUse": [
       {
@@ -7,7 +7,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": ".claude/hooks/guard-geschuetzte-daten.sh"
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/guard-geschuetzte-daten.sh"
           }
         ]
       }
@@ -17,7 +17,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": ".claude/hooks/stop-git-status.sh"
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/stop-git-status.sh"
           }
         ]
       }
