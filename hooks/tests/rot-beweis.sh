@@ -51,13 +51,24 @@ mutante "blockt alles" 'NR==2{print "exit 2"} {print}'
 # 3. Fail-open: ohne jq still durchlassen statt blocken (frueheres Verhalten).
 mutante "ohne jq still durchlassen" '/jq --version/{f=1} f && /exit 2/{sub(/exit 2/,"exit 0"); f=0} {print}'
 # 4. git commit -a wird nicht mehr als Stage-Befehl erkannt (frueherer Stand).
-mutante "commit -a nicht erkannt" '!d && /git\\s\+commit/ {d=1; next} {print}'
+mutante "commit -a nicht erkannt" '{sub(/ a\) alle=1 ;;/, " a) ;;")} {print}'
 # 5. Schaetzen statt messen: --dry-run faellt weg, Rueckfall auf git status.
 mutante "schaetzt mit git status" '{gsub(/roh=\$\(git add -(u|A) --dry-run 2>\/dev\/null\); rc=\$\?/, "roh=; rc=1")} {print}'
 # 6. Pre-commit-Modus sieht den Index nicht (liest eine leere Kandidatenliste).
 mutante "--staged sieht den Index nicht" '{sub(/git diff --cached --name-only --diff-filter=ACMR/, "true")} {print}'
 # 7. Musterdatei unter .codex/ wird uebersehen (nur .claude/ gelesen).
 mutante ".codex-Musterdatei uebersehen" '{sub(/ \.codex\/geschuetzte-pfade/, "")} {print}'
+# 8. Alter Messweg: gezieltes git add misst wieder alles mit -A (Fehlalarm
+#    bei harmlosem Pfad neben unverfolgter .env).
+mutante "gezieltes add misst mit -A" '/add --dry-run \$\{mess_optionen/{print "    roh=$(git add -A --dry-run 2>/dev/null); rc=$?"; next} {print}'
+# 9. Fail-closed beim Parsen entfernt: was sich nicht zerlegen laesst, wird
+#    durchgelassen statt breit gemessen ($(…), Ketten).
+mutante "unlesbarer Befehl durchgelassen" '{sub(/if zerlege "\$befehl" && /, "zerlege \"$befehl\" || exit 0; if ")} {print}'
+# 10. Globale Optionen mit Wert (git -C <pfad> add) werden uebersprungen —
+#     altes Erkennungsmuster.
+mutante "git -C <pfad> add nicht erkannt" '/^  GIT_VOR=/{print; print "  GIT_VOR=\"(^|[;&|]|\\\\s)git\\\\s+(-[^ ]+\\\\s+)*\""; next} {print}'
+# 11. git commit mit Pfadangaben stagt nichts (fruehere Annahme).
+mutante "commit-Pfade nicht gemessen" '{sub(/mess_optionen\+=\(-u\); messart=gezielt/, "messart=keine")} {print}'
 
 echo
 echo "$erkannt erkannt, $blind blind"

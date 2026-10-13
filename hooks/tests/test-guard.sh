@@ -76,11 +76,15 @@ echo
 echo "Gemessen statt geschaetzt:"
 # Ein geschuetzter Pfad ist bereits verfolgt und wurde geaendert.
 mkdir -p shared/data && echo '{"a":1}' > shared/data/echt.json
-git add -f shared/data/echt.json >/dev/null 2>&1
+git add -f shared/data/echt.json harmlos.md >/dev/null 2>&1
 git commit -qm fixture >/dev/null 2>&1
 echo '{"a":2}' > shared/data/echt.json
 pruefe "commit -am stagt verfolgte Datei"    2 "git commit -am 'wip'"
 pruefe "commit ohne -a stagt nichts"         0 "git commit -m 'wip'"
+pruefe "commit mit Pfad stagt diese Datei"    2 "git commit -m 'wip' shared/data/echt.json"
+pruefe "commit -i -- Pfad"                   2 "git commit -i -m wip -- shared/data/echt.json"
+pruefe "commit mit harmlosem Pfad"           0 "git commit -m 'wip' harmlos.md"
+pruefe "git -C . commit -am"                 2 "git -C . commit -am 'wip'"
 git checkout -- shared/data/echt.json 2>/dev/null
 
 # `git add -u` fasst Unverfolgtes nicht an — `git status` haette es gemeldet.
@@ -90,6 +94,43 @@ pruefe "add -A erfasst dieselbe .env"        2 "git add -A"
 rm -f .env
 git rm -q --cached shared/data/echt.json >/dev/null 2>&1
 rm -rf shared
+
+echo
+echo "Gezieltes git add — gemessen wird, was DIESER Befehl erfasst:"
+# Eine unverfolgte .env liegt herum. Ein git add, das sie nicht nennt und nicht
+# breit stagt, darf nicht blocken — sonst wird der Guard abgeschaltet.
+echo "GEHEIM=1" > .env
+mkdir -p docs sub && echo "notiz" > docs/notiz.md && echo "x" > sub/x.md
+pruefe "add harmlos.md, .env liegt daneben"   0 "git add harmlos.md"
+pruefe "add Pfad im Unterordner"              0 "git add docs/notiz.md"
+pruefe "add -- harmlos.md"                    0 "git add -- harmlos.md"
+pruefe ".env direkt benannt (gezielt)"        2 "git add .env"
+pruefe "git add . mit .env"                   2 "git add ."
+pruefe "git add -A mit .env"                  2 "git add -A"
+pruefe "harmlos und .env zusammen"            2 "git add harmlos.md .env"
+pruefe "Pfad per Kommandosubstitution: breit"       2 'git add "$(echo .env)"'
+pruefe "Kette: unlesbar, breit"                2 "git add harmlos.md && git add .env"
+pruefe "Pfad fehlt: Rueckfall breit"           2 "git add harmlos.md fehlt.md"
+# Arbeitsverzeichnis aus dem Feld cwd (Claude Code und Codex liefern es mit).
+mit_ort() { # name  erwarteter_code  ort  befehl
+  local code
+  printf '{"cwd":"%s","tool_input":{"command":"%s"}}' "$3" "$4" | "$GUARD" >/dev/null 2>&1; code=$?
+  if [ "$code" -eq "$2" ]; then printf '  ok    %-46s (Code %s)\n' "$1" "$code"; ok=$((ok+1))
+  else printf '  FEHL  %-46s (Code %s, erwartet %s)\n' "$1" "$code" "$2"; fehl=$((fehl+1)); fi
+}
+mit_ort "cwd Unterordner, add notiz.md"       0 "$arbeitsplatz/docs" "git add notiz.md"
+mit_ort "cwd Unterordner, add ../.env"        2 "$arbeitsplatz/docs" "git add ../.env"
+echo
+echo "Globale git-Optionen vor add (git -C):"
+pruefe "git -C . add -A mit .env"             2 "git -C . add -A"
+pruefe "git -C sub add . mit .env"            2 "git -C sub add ."
+rm -f .env
+# Ignorierte .env: breites add laesst sie liegen, add -f nimmt sie trotzdem.
+echo ".env" > .gitignore && echo "GEHEIM=1" > .env
+pruefe "add -f auf ignorierte .env"           2 "git add -f .env"
+pruefe "add .gitignore neben ignorierter .env" 0 "git add .gitignore"
+rm -f .env .gitignore
+rm -rf docs sub
 
 echo
 echo "Codex-Eingabeformat:"
