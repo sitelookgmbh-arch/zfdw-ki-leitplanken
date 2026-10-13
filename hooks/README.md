@@ -14,7 +14,7 @@ darf. Begründung: [04 — Deterministische Guards](../methode/04_Deterministisc
 | `codex-hooks.json.vorlage` | — | Verdrahtung des Guards für Codex (`.codex/hooks.json`) |
 | `pre-commit.vorlage` | git pre-commit | Derselbe Guard mit `--staged`: prüft den Index, greift bei jedem, der committet |
 | `geschuetzte-pfade.vorlage` | — | Schutzmuster, projektspezifisch zu setzen |
-| `tests/test-guard.sh` | — | 44 Fälle, davon 15 bewusste Nicht-Treffer — inkl. gezieltem `git add`, `git -C`, Codex-Eingabeformat und `--staged` |
+| `tests/test-guard.sh` | — | 48 Fälle, davon 15 bewusste Nicht-Treffer — inkl. gezieltem `git add`, `git -C`, Codex-Eingabeformat, `--staged` und der Verdrahtung beider Vorlagen aus einem Unterordner |
 | `tests/rot-beweis.sh` | — | Rot-Beweis: 11 absichtlich kaputte Guards, die Suite muss jeden bemerken |
 
 ## Einbau
@@ -26,6 +26,15 @@ chmod +x .claude/hooks/*.sh
 cp hooks/settings.json.vorlage .claude/settings.json
 cp hooks/geschuetzte-pfade.vorlage .claude/geschuetzte-pfade
 ```
+
+**Die Vorlage ruft die Hooks über `"$CLAUDE_PROJECT_DIR"` auf, nicht über einen relativen Pfad.**
+Claude Code startet einen Hook im aktuellen Arbeitsverzeichnis der Sitzung — nach einem `cd sub`
+also in `sub/`. Ein relativer Pfad `.claude/hooks/…` wird dort nicht gefunden; der Hook endet mit
+einem Fehler, und der ist nicht blockierend: Der Befehl läuft durch. Das ist fail-open, und zwar
+still. `$CLAUDE_PROJECT_DIR` zeigt immer auf die Projektwurzel, in der die Sitzung begann. Die
+Anführungszeichen gehören dazu, sonst bricht ein Pfad mit Leerzeichen. Die Codex-Vorlage löst
+dasselbe über `$(git rev-parse --show-toplevel)`. Beide Verdrahtungen prüft
+`tests/test-guard.sh` aus einem Unterordner heraus, mit Gegenprobe gegen den relativen Pfad.
 
 Für Codex und für den pre-commit-Hook: siehe [Mit anderen Assistenten](../README.md#mit-anderen-assistenten).
 Die Schutzmuster sucht der Guard in `.claude/geschuetzte-pfade`, `.codex/geschuetzte-pfade` oder

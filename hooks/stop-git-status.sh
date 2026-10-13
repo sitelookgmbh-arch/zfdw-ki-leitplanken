@@ -7,7 +7,7 @@
 #
 # Einbindung (.claude/settings.json):
 #   "hooks": { "Stop": [ { "hooks": [ { "type": "command",
-#     "command": ".claude/hooks/stop-git-status.sh" } ] } ] }
+#     "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/stop-git-status.sh" } ] } ] }
 
 set -uo pipefail
 git rev-parse --is-inside-work-tree >/dev/null 2>&1 || exit 0

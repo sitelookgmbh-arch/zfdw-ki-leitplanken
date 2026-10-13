@@ -151,7 +151,10 @@ cp hooks/geschuetzte-pfade.vorlage .codex/geschuetzte-pfade
 
 Die Vorlage ruft den Guard über `git rev-parse --show-toplevel` auf, nicht über einen relativen
 Pfad: Codex startet Hooks im Arbeitsverzeichnis der Sitzung, und ein Hook, der nicht gefunden wird,
-gilt dort als fehlgeschlagen — der Befehl läuft trotzdem.
+gilt dort als fehlgeschlagen — der Befehl läuft trotzdem. Live geprüft mit `codex-cli` 0.154.0:
+Aus einem Unterordner gestartet, blockt der Guard `git add -A` neben einer `.env`. Zweite Falle:
+Hooks aus `.codex/hooks.json` lädt Codex nur, wenn das Projekt als vertrauenswürdig eingestuft
+ist (laut Codex-Doku); sonst ist der Guard dort schlicht nicht aktiv.
 
 **Jeder andere Assistent — und jeder Mensch:** den Guard ablegen (`.claude/hooks/`,
 `.codex/hooks/` oder `.githooks/`) und den pre-commit-Hook einhängen:

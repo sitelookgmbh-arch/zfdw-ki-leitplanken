@@ -6,6 +6,11 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
 ## [Unreleased]
 
 ### Fixed
+- **Claude-Code-Vorlage:** `hooks/settings.json.vorlage` ruft Guard und Stop-Hook über
+  `"$CLAUDE_PROJECT_DIR"` auf statt relativ. Claude Code startet Hooks im aktuellen
+  Arbeitsverzeichnis; nach einem `cd` in einen Unterordner fand der relative Pfad den Guard
+  nicht, und `git add -A` lief mit einer `.env` im Arbeitsbaum durch (fail-open, live
+  nachgestellt). Gleiche Ursache wie beim Codex-Fix unten.
 - **Guard: gezieltes `git add <pfad>` misst nur seine Pfade.** Bisher maß der Guard jedes
   `git add` (außer `-u`) mit `git add -A --dry-run` und blockte `git add notiz.md`, sobald
   irgendwo eine unverfolgte `.env` lag. Jetzt misst er einen schlichten Befehl mit wörtlichen
@@ -20,9 +25,14 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
   `git add -u --dry-run -- <pfade>`. Ein `git commit`, das sich nicht sicher zerlegen lässt
   (z. B. Nachricht per `$(cat …)`), misst alle verfolgten Änderungen.
 - **Codex-Vorlage:** Hook-Pfad über `git rev-parse --show-toplevel` statt relativ — Codex
-  startet Hooks im Sitzungsverzeichnis, ein nicht gefundener Hook blockt dort nicht.
+  startet Hooks im Sitzungsverzeichnis, ein nicht gefundener Hook blockt dort nicht. Live
+  geprüft mit `codex-cli` 0.154.0 aus einem Unterordner; README nennt zusätzlich die
+  Vertrauensstufe des Projekts als Voraussetzung für Projekt-Hooks.
 
 ### Changed
+- **Testsuite 44 → 48 Fälle:** Die Hook-Befehle beider Vorlagen (Claude Code, Codex) werden so,
+  wie sie in der Vorlage stehen, per `sh -c` aus einem Unterordner ausgeführt; eine Gegenprobe
+  zeigt, dass ein relativer Pfad von dort nicht gefunden wird.
 - **Grenzen ehrlich benannt** (`hooks/README.md`, Methode 04): Ein `PreToolUse`-Guard sieht nur
   Befehle des Assistenten-Werkzeugs, nicht den Menschen im Terminal, andere Werkzeuge, `git push`
   bereits verfolgter Dateien oder Abfluss außerhalb von git. Staffel aus Werkzeug-Hook,

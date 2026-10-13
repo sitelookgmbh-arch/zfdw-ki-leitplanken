@@ -8,7 +8,8 @@
 # Aufruf:  hooks/tests/test-guard.sh
 
 set -uo pipefail
-GUARD="${GUARD:-$(cd "$(dirname "$0")/.." && pwd)/guard-geschuetzte-daten.sh}"
+VORLAGEN="$(cd "$(dirname "$0")/.." && pwd)"
+GUARD="${GUARD:-$VORLAGEN/guard-geschuetzte-daten.sh}"
 ok=0; fehl=0
 
 arbeitsplatz=$(mktemp -d)
@@ -163,6 +164,42 @@ mkdir -p .codex && printf 'kunden-*.csv\n' > .codex/geschuetzte-pfade
 echo "a,b" > kunden-x.csv && git add kunden-x.csv
 staged "Musterdatei unter .codex/"             2
 git rm -q --cached kunden-x.csv; rm -rf kunden-x.csv .codex
+
+echo
+echo "Verdrahtung aus den Vorlagen, Aufruf aus einem Unterordner:"
+# Claude Code und Codex starten Hooks im Arbeitsverzeichnis der Sitzung, nicht
+# in der Repo-Wurzel. Ein relativer Hook-Pfad wird dort nicht gefunden, und ein
+# nicht gefundener Hook blockt nicht (fail-open). Geprueft wird der Befehl genau
+# so, wie er in der Vorlage steht, ausgefuehrt per `sh -c`.
+mkdir -p .claude/hooks .codex/hooks sub
+cp "$GUARD" .claude/hooks/guard-geschuetzte-daten.sh
+cp "$GUARD" .codex/hooks/guard-geschuetzte-daten.sh
+cp "$VORLAGEN/stop-git-status.sh" .claude/hooks/stop-git-status.sh
+chmod +x .claude/hooks/*.sh .codex/hooks/*.sh
+echo "GEHEIM=1" > .env
+verdrahtet() { # name  erwarteter_code  vorlage  jq-pfad
+  local befehl code ausgabe
+  befehl=$(jq -er "$4" "$VORLAGEN/$3" 2>/dev/null) || befehl=""
+  if [ -z "$befehl" ]; then
+    printf '  FEHL  %-46s (kein Befehl in %s)\n' "$1" "$3"; fehl=$((fehl+1)); return
+  fi
+  ausgabe=$(cd "$arbeitsplatz/sub" && printf '{"cwd":"%s","tool_input":{"command":"git add -A"}}' "$arbeitsplatz/sub" \
+      | CLAUDE_PROJECT_DIR="$arbeitsplatz" sh -c "$befehl" 2>&1); code=$?
+  # Exit 0 allein beweist nicht, dass ein Skript lief: Beide Hooks geben hier etwas aus.
+  [ -z "$ausgabe" ] && code=99
+  if [ "$code" -eq "$2" ]; then printf '  ok    %-46s (Code %s)\n' "$1" "$code"; ok=$((ok+1))
+  else printf '  FEHL  %-46s (Code %s, erwartet %s)\n' "$1" "$code" "$2"; fehl=$((fehl+1)); fi
+}
+verdrahtet "Claude-Vorlage: Guard blockt aus sub/"   2 settings.json.vorlage '.hooks.PreToolUse[0].hooks[0].command'
+verdrahtet "Claude-Vorlage: Stop-Hook laeuft aus sub/" 0 settings.json.vorlage '.hooks.Stop[0].hooks[0].command'
+verdrahtet "Codex-Vorlage: Guard blockt aus sub/"    2 codex-hooks.json.vorlage '.hooks.PreToolUse[0].hooks[0].command'
+# Gegenprobe: Der alte relative Pfad wird aus sub/ nicht gefunden (127, kein Block).
+# Ohne diese Probe bewiese ein Gruen oben nicht, dass der Unterordner etwas aendert.
+( cd "$arbeitsplatz/sub" && printf '{"tool_input":{"command":"git add -A"}}' \
+    | sh -c ".claude/hooks/guard-geschuetzte-daten.sh" >/dev/null 2>&1 ); code=$?
+if [ "$code" -eq 127 ]; then printf '  ok    %-46s (Code %s)\n' "Gegenprobe: relativer Pfad aus sub/ fehlt" "$code"; ok=$((ok+1))
+else printf '  FEHL  %-46s (Code %s, erwartet 127)\n' "Gegenprobe: relativer Pfad aus sub/ fehlt" "$code"; fehl=$((fehl+1)); fi
+rm -rf .env .claude .codex sub
 
 echo
 echo "Fail-closed ohne jq:"
