@@ -95,6 +95,5 @@ dafür gibt es das Mensch-Gate aus [01 — Sprintplan](01_Sprintplan-und-Write-S
 - [ ] Wird die Suite rot, wenn man den Guard absichtlich beschädigt (`rot-beweis.sh`)?
 - [ ] Misst der Guard die Wirkung — oder liest er einen Zustand daneben und schließt daraus?
 - [ ] Was tut er, wenn eine seiner Voraussetzungen fehlt? Blocken ist die einzige richtige Antwort.
-- [ ] Ist dokumentiert, welche Wege er nicht sieht (Mensch im Terminal, andere Werkzeuge, Push,
-      Abfluss außerhalb von git) — und welche Stufe sie abdeckt?
+- [ ] Ist dokumentiert, welche Wege er nicht sieht — und welche Stufe sie stattdessen abdeckt?
 - [ ] Weiß der Assistent aus der Anweisungsdatei, warum er blockiert wird?
