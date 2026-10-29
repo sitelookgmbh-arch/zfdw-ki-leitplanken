@@ -6,6 +6,10 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
 ## [Unreleased]
 
 ### Added
+- **Methode 11 — Nahtstellen-Register** (`methode/11_Nahtstellen-Register.md`): Fehler an Übergaben
+  zwischen Werkzeugen, Läufen und Ständen, die kein Diff-Review sieht, in einem Register mit festen
+  Feldern festhalten, das jedes Review vor der Freigabe liest. Ins Register gehört nur, was an einer
+  Datei erkennbar ist.
 - **Dependabot für GitHub Actions** (`.github/dependabot.yml`): monatlich, gebündelt in einem PR. Die SHA-Pins der CI veralten sonst still.
 
 ### Fixed
