@@ -1,10 +1,14 @@
-# Guard-Testsuite und Rot-Beweis unter Linux.
+# Guard-Testsuite und Rot-Beweis unter Linux, dazu die Testsuite des
+# Herkunfts-Gates mit eigenem Rot-Beweis.
 #
-# Lokal laufen beide unter macOS (bash 3.2). Diese CI prueft dieselben Skripte
-# mit dem bash/git/jq eines Linux-Runners — die Umgebung, in der die Hooks bei
-# vielen Nutzern laufen.
+# Lokal laufen alle unter macOS (bash 3.2, BSD grep). Diese CI prueft dieselben
+# Skripte mit dem bash/git/jq/grep eines Linux-Runners — die Umgebung, in der
+# die Hooks bei vielen Nutzern laufen.
 #
-# Bewusst NICHT hier: das Herkunfts-Gate (werkzeuge/herkunft-check.sh). Ohne die
+# Die Gate-Suite arbeitet mit eigenen, synthetischen Begriffen. Sie prueft das
+# Werkzeug, nicht dieses Repository.
+#
+# Bewusst NICHT hier: der Gate-Lauf gegen dieses Repository. Ohne die
 # private Begriffsliste prueft es nur die Vorlage, die keinen aktiven Begriff
 # enthaelt (Exit 2, keine Aussage). Die Liste als Secret einzuspeisen hiesse:
 # Kunden- und Personennamen auf fremden Servern, und jeder Treffer gaebe die
@@ -44,3 +48,23 @@ jobs:
 
       - name: Rot-Beweis (jede Mutante muss die Suite rot machen)
         run: hooks/tests/rot-beweis.sh
+
+  herkunft:
+    name: Herkunfts-Gate-Suite und Rot-Beweis (Linux)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Werkzeugstand
+        run: |
+          bash --version | head -n 1
+          grep --version | head -n 1
+
+      - name: Gate-Testsuite
+        run: werkzeuge/tests/test-herkunft.sh
+
+      - name: Rot-Beweis (jede Mutante muss die Suite rot machen)
+        run: werkzeuge/tests/rot-beweis.sh
