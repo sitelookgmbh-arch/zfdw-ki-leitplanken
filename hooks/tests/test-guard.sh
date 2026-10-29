@@ -115,10 +115,11 @@ pruefe "Kette: unlesbar, breit"                2 "git add harmlos.md && git add 
 pruefe "Pfad fehlt: Rueckfall breit"           2 "git add harmlos.md fehlt.md"
 # Arbeitsverzeichnis aus dem Feld cwd (Claude Code und Codex liefern es mit).
 mit_ort() { # name  erwarteter_code  ort  befehl
-  local code
-  printf '{"cwd":"%s","tool_input":{"command":"%s"}}' "$3" "$4" | "$GUARD" >/dev/null 2>&1; code=$?
-  if [ "$code" -eq "$2" ]; then printf '  ok    %-46s (Code %s)\n' "$1" "$code"; ok=$((ok+1))
-  else printf '  FEHL  %-46s (Code %s, erwartet %s)\n' "$1" "$code" "$2"; fehl=$((fehl+1)); fi
+  local code meldung
+  printf '{"cwd":"%s","tool_input":{"command":"%s"}}' "$3" "$4" | "$GUARD" >/dev/null 2>"$arbeitsplatz/stderr"; code=$?
+  meldung=$(cat "$arbeitsplatz/stderr")
+  if [ "$code" -eq "$2" ] && { [ "$2" -ne 2 ] || [[ "$meldung" == *BLOCKIERT* ]]; }; then printf '  ok    %-46s (Code %s)\n' "$1" "$code"; ok=$((ok+1))
+  else printf '  FEHL  %-46s (Code %s, erwartet %s; stderr: %s)\n' "$1" "$code" "$2" "$meldung"; fehl=$((fehl+1)); fi
 }
 mit_ort "cwd Unterordner, add notiz.md"       0 "$arbeitsplatz/docs" "git add notiz.md"
 mit_ort "cwd Unterordner, add ../.env"        2 "$arbeitsplatz/docs" "git add ../.env"
@@ -169,6 +170,12 @@ mit_ort "cwd ohne Repo blockt" 2 "$ohne_repo" "git add -A"
 mit_ort "cwd fehlt blockt" 2 "" "git add -A"
 mit_ort "cwd existiert nicht blockt" 2 "$arbeitsplatz/fehlt" "git add -A"
 mit_ort "cwd relativ blockt" 2 "fremd" "git add -A"
+mit_ort "Dollarzeichen ohne git, cwd ohne Repo" 2 "$ohne_repo" 'echo $HOME'
+mit_ort "Backticks ohne git, cwd ohne Repo" 2 "$ohne_repo" 'echo `pwd`'
+# Verzeichniswechsel deterministisch scheitern lassen, auch mit Root-Rechten.
+printf 'cd() { return 1; }\n' > "$arbeitsplatz/cd-fehler.sh"
+BASH_ENV="$arbeitsplatz/cd-fehler.sh" mit_ort "cd scheitert mit Blockgrund" 2 "$arbeitsplatz" 'echo $HOME'
+rm -f "$arbeitsplatz/cd-fehler.sh"
 cd "$arbeitsplatz" || exit 1
 rm -rf "$hook_ort" "$ohne_repo" fremd
 

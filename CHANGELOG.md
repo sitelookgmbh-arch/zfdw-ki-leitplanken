@@ -24,6 +24,10 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
   Sammlung zusätzlich verlangt.
 
 ### Fixed
+- **Guard: Blockgründe bei ungültigem Arbeitsverzeichnis.** Fehlendes Verzeichnis,
+  gescheiterter Verzeichniswechsel und nicht bestimmbares Repo liefern eine Begründung
+  auf stderr. Regressionen prüfen neben Exit 2 die Meldung, auch bei Expansionen ohne git;
+  eine zusätzliche Mutante entfernt diese Gründe.
 - **Sicherheitsfix im Guard:** Unquotierte Kommandosubstitutionen mit Leerzeichen
   (etwa `git -C $(echo sub) add .`) konnten den Vorfilter umgehen. Dollarzeichen und
   Backticks erzwingen jetzt eine breite Messung, ohne die Expansion auszuführen.

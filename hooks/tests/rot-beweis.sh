@@ -85,7 +85,10 @@ mutante "mehrere -C: nur das erste zaehlt" '{sub(/tok=\(git "\$\{tok\[@\]:3\}"\)
 # Expansionserkennung entfernen: wieder nur der alte Vorfilter.
 mutante "Substitution im Vorfilter uebersehen" '/case "\$befehl" in .*substitution=1/{next} {print}'
 # Breite Messung wieder im Prozessverzeichnis.
-mutante "breite Messung ignoriert cwd" '/cd "\$mess_ort" \|\| exit 2/{print "  :"; next} {print}'
+mutante "breite Messung ignoriert cwd" '/cd "\$mess_ort" \|\|/{print "  :"; next} {print}'
+
+# Blockcodes allein reichen nicht: Ohne Begruendung ist die Sperre stumm.
+mutante "cwd-Blockgruende fehlen" '{gsub(/echo "BLOCKIERT — (cwd ist kein vorhandenes Verzeichnis\.|Wechsel nach cwd gescheitert; Befehl nicht messbar\.|Repo aus cwd nicht bestimmbar; Befehl nicht messbar\.)" >&2; /, "")} {print}'
 
 echo
 echo "$erkannt erkannt, $blind blind"

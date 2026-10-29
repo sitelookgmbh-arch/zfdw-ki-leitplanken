@@ -14,8 +14,8 @@ darf. Begründung: [04 — Deterministische Guards](../methode/04_Deterministisc
 | `codex-hooks.json.vorlage` | — | Verdrahtung des Guards für Codex (`.codex/hooks.json`) |
 | `pre-commit.vorlage` | git pre-commit | Derselbe Guard mit `--staged`: prüft den Index, greift bei jedem, der committet |
 | `geschuetzte-pfade.vorlage` | — | Schutzmuster, projektspezifisch zu setzen |
-| `tests/test-guard.sh` | — | 69 Fälle, davon 19 mit erwartetem Exit 0 — inkl. gezieltem `git add`, `git -C <pfad>` (gemessen im Zielverzeichnis), Codex-Eingabeformat, `--staged` und der Verdrahtung beider Vorlagen aus einem Unterordner |
-| `tests/rot-beweis.sh` | — | Rot-Beweis: 16 absichtlich kaputte Guards, die Suite muss jeden bemerken |
+| `tests/test-guard.sh` | — | 72 Fälle, davon 19 mit erwartetem Exit 0 — inkl. gezieltem `git add`, `git -C <pfad>` (gemessen im Zielverzeichnis), Codex-Eingabeformat, `--staged` und der Verdrahtung beider Vorlagen aus einem Unterordner |
+| `tests/rot-beweis.sh` | — | Rot-Beweis: 17 absichtlich kaputte Guards, die Suite muss jeden bemerken |
 
 ## Einbau
 
@@ -89,7 +89,9 @@ schützt er gar nichts mehr.
   misst er breit mit `-A`, auch ohne wörtlich erkennbares `git add`. Das erfasst unquotierte
   Substitutionen mit Leerzeichen und variable Unterbefehle, kann aber auch harmlose Befehle
   oder wörtlich zitierte Dollarzeichen blockieren. Das Ziel einer dynamischen Verzeichniswahl
-  außerhalb des Repos aus `cwd` kann diese Messung nicht bestimmen.
+  außerhalb des Repos aus `cwd` kann diese Messung nicht bestimmen. Liegt `cwd` außerhalb
+  eines Repos, blockt er deshalb auch Befehle ohne git wie `echo "$HOME"` mit Exit 2
+  und einer Begründung auf stderr.
 - **Ohne `jq` blockt er.** Ohne geparste Kommandozeile prüft er nichts — und ein Guard, der auf einem
   frisch aufgesetzten Rechner unbemerkt abgeschaltet ist, ist schlimmer als keiner. Fail-closed ist
   hier die einzige vertretbare Richtung.
@@ -126,7 +128,7 @@ blockt deshalb auch nicht. Mehrere `-C`, `-C` neben weiteren globalen Optionen, 
 Variable oder Substitution oder ein fehlendes Zielverzeichnis: breit wie zuvor. Der Fix darf Fehlalarme abbauen, aber nie Schutz. Den Ort des
 Befehls liest er aus dem Feld `cwd`. Auch die breite Messung und die Suche nach Schutzmustern
 verwenden dieses Repo. Fehlt `cwd`, ist es kein absolutes vorhandenes Verzeichnis oder liegt
-es außerhalb eines Repos, blockt der Guard einen prüfpflichtigen Befehl (Exit 2). Nebenbei erfasst die gezielte Messung `git add -f` auf eine
+es außerhalb eines Repos, blockt der Guard einen prüfpflichtigen Befehl (Exit 2 mit Begründung auf stderr). Nebenbei erfasst die gezielte Messung `git add -f` auf eine
 ignorierte Datei, die die breite Messung übersieht. Ein **leeres** Messergebnis ist ein Ergebnis („nichts
 betroffen"), kein Fehlschlag — auf `git status` fällt der Guard nur zurück, wenn `--dry-run` selbst
 fehlschlägt.

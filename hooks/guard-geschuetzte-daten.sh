@@ -97,7 +97,7 @@ if [ "$modus" = hook ]; then
     || printf '%s' "$befehl" | grep -qE "${GIT_VOR}commit(\s|$)" \
     || exit 0
   case "$mess_ort" in
-    /*) [ -d "$mess_ort" ] || exit 2 ;;
+    /*) [ -d "$mess_ort" ] || { echo "BLOCKIERT — cwd ist kein vorhandenes Verzeichnis." >&2; exit 2; } ;;
     *) echo "BLOCKIERT — cwd fehlt oder ist ungueltig." >&2; exit 2 ;;
   esac
 fi
@@ -246,10 +246,10 @@ if [ "$modus" = hook ]; then
 fi
 
 if [ "$modus" = hook ]; then
-  cd "$mess_ort" || exit 2
+  cd "$mess_ort" || { echo "BLOCKIERT — Wechsel nach cwd gescheitert; Befehl nicht messbar." >&2; exit 2; }
 fi
 repo_wurzel=$(git rev-parse --show-toplevel 2>/dev/null) || {
-  [ "$modus" = hook ] && exit 2
+  [ "$modus" = hook ] && { echo "BLOCKIERT — Repo aus cwd nicht bestimmbar; Befehl nicht messbar." >&2; exit 2; }
   exit 0
 }
 cd "$repo_wurzel" || exit 0
