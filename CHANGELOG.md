@@ -24,6 +24,15 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
   Sammlung zusätzlich verlangt.
 
 ### Fixed
+- **Herkunfts-Gate fail-closed** (`werkzeuge/herkunft-check.sh`): Das Gate wertete nur aus, ob
+  die Trefferliste leer war, und verschluckte Fehler von grep. Ein ungültiges Muster in der
+  Begriffsliste (etwa `[`), ein Ziel, das es nicht gibt, oder eine unlesbare Datei im Baum
+  ergaben „kein Treffer“ und Exit 0 — eine Prüfung, die nicht stattfand, meldete grün. Jetzt
+  enden diese Fälle mit dem neuen Exit 3 und einer Meldung auf stderr: jeder Begriff wird vorab
+  geprüft und ein ungültiger beim Namen genannt; Ziel fehlt oder ist unlesbar; grep fehlt oder
+  endet mit rc > 1. Die Codes 0 (kein Treffer), 1 (Treffer) und 2 (keine Begriffsdatei) behalten
+  ihre Bedeutung. Nebenbei: Ein Begriff mit führendem `-` wurde als grep-Option gelesen und lief
+  ebenfalls still durch; das Muster wird jetzt mit `-e` übergeben.
 - **Methode 05:** nannte „sieben Mutanten", `hooks/tests/rot-beweis.sh` baut inzwischen mehr. Die
   Methode nennt keine feste Zahl mehr und verweist auf Skript und Ausgabe.
 - **Claude-Code-Vorlage:** `hooks/settings.json.vorlage` ruft Guard und Stop-Hook über
@@ -50,6 +59,9 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
   Vertrauensstufe des Projekts als Voraussetzung für Projekt-Hooks.
 
 ### Changed
+- **Herkunfts-Gate mit eigener Testsuite und Rot-Beweis** (`werkzeuge/tests/`): 16 Fälle
+  (Treffer, Nicht-Treffer, keine Begriffe, Prüfungsfehler), dazu 9 Mutanten, die jeweils
+  mindestens einen Fall rot machen müssen. Beide laufen in der CI als eigener Job.
 - **Testsuite 44 → 48 Fälle:** Die Hook-Befehle beider Vorlagen (Claude Code, Codex) werden so,
   wie sie in der Vorlage stehen, per `sh -c` aus einem Unterordner ausgeführt; eine Gegenprobe
   zeigt, dass ein relativer Pfad von dort nicht gefunden wird.

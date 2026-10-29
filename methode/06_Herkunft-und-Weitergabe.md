@@ -89,7 +89,7 @@ Eine Prüfung, die man ausführen kann, nicht nur vornehmen will:
    grep -rinE "kunde|produktname|systemname|fachbegriff|domain\.tld" . --exclude-dir=.git
    ```
 
-   Im Repository erledigt das `werkzeuge/herkunft-check.sh` mit einer lokalen, nicht eingecheckten Begriffsliste (`.herkunft-begriffe`, Vorlage `werkzeuge/herkunft-begriffe.vorlage`). Eine eigene Testsuite hat das Werkzeug bisher nicht. Leere Ausgabe bedeutet nur: kein Treffer auf diese Suchmuster. Das ist die untere Schranke, nicht die Freigabe.
+   Im Repository erledigt das `werkzeuge/herkunft-check.sh` mit einer lokalen, nicht eingecheckten Begriffsliste (`.herkunft-begriffe`, Vorlage `werkzeuge/herkunft-begriffe.vorlage`). Es arbeitet fail-closed: Ein ungültiges Muster, ein fehlendes oder unlesbares Ziel oder ein scheiterndes grep enden mit Exit 3, nie mit „kein Treffer“ (Testsuite und Rot-Beweis unter `werkzeuge/tests/`). Leere Ausgabe bedeutet nur: kein Treffer auf diese Suchmuster. Das ist die untere Schranke, nicht die Freigabe.
 
 2. **Belege lesen.** Jeden projektspezifischen Beleg darauf prüfen, ob er eine allgemeine Aussage trägt. Wenn ja: einen neuen, synthetischen Beleg herstellen. Der Beleg wird dadurch schwächer — das ist der Preis, und er ist angemessen. Wenn nein: Aussage gebunden halten.
 
@@ -139,7 +139,7 @@ So wird aus Sorgfalt keine allgemeine Veröffentlichungssperre. Die Prüfung ric
 
 - Die Beispiele sind vollständig synthetisch. Sie begründen keine Freigabe realer Projektinformationen.
 - Einschlägige Verträge, Vertraulichkeitsvereinbarungen und Rechte an Arbeitsergebnissen wurden nicht geprüft.
-- `werkzeuge/herkunft-check.sh` ist vorhanden und im Einsatz, hat aber keine eigene Testsuite.
+- `werkzeuge/herkunft-check.sh` ist vorhanden und im Einsatz; die Testsuite prüft das Werkzeug mit synthetischen Begriffen, nicht die Vollständigkeit einer realen Begriffsliste.
 - Ob die zweistufige Prüfung im konkreten Veröffentlichungskontext rechtlich ausreicht, ist offen. Dieser Entwurf ist **keine Rechtsberatung**.
 
 ## Fragen an die Fachperson Recht
