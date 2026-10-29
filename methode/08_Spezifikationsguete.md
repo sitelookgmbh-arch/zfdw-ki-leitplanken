@@ -6,7 +6,11 @@
 ## Das Problem
 
 Werkzeuge sagen, **wie** eine Spec auszusehen hat: welche Abschnitte, welches Format, welche
-Given/When/Then-Struktur. Keines sagt, **ob sie gut ist**.
+Given/When/Then-Struktur. Manche prüfen inzwischen auch, **ob sie taugt** — SpecKit etwa lässt die
+Spec per Checkliste auf Vollständigkeit, Klarheit und Widerspruchsfreiheit prüfen (siehe
+[07 — Verortung](07_Verortung.md#3-nachweise-statt-akzeptanzkriterien)). Diese Methode verlangt
+zusätzlich einen Maßstab, der an kein Werkzeug gebunden ist und auch in die andere Richtung
+trägt: ein Kriterium dafür, dass eine Zeile **weg darf**.
 
 Das rächt sich in beide Richtungen. Die Spec wird zu dünn, dann rät der Assistent — und rät
 konsistent, was schlimmer ist als zu raten und zu straucheln. Oder sie wird zu dick, und dann

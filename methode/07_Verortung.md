@@ -61,12 +61,26 @@ Regel, [04](04_Deterministische-Guards.md) macht daraus, wo nötig, eine harte.
 
 ### 3. Nachweise statt Akzeptanzkriterien
 
-Alle fünf kennen Akzeptanzkriterien. Keines verlangt **den Beleg dazu** — die Befehlsausgabe, den
-Protokollauszug, den Fundort. Genauso wenig kennen sie Datenklassen, Zugangsrückgabe,
-Änderungsklassen mit benannter Freigabe oder eine Tabelle für ausgelassene Schritte mit der Person,
-die das Restrisiko abgenommen hat.
+Alle fünf kennen Akzeptanzkriterien, und einige prüfen mehr, als ihnen oft zugetraut wird.
+SpecKit lässt mit `/speckit.checklist` die Spezifikation selbst prüfen — ob sie „complete, clear,
+unambiguous, and consistent" ist; die Checkliste gehört dem Reviewer, die Umsetzung darf sie
+„not silently self-approve". `/speckit.analyze` sucht Widersprüche und Lücken zwischen Spec, Plan
+und Aufgaben. OpenSpec gleicht mit `/opsx:verify` die Umsetzung gegen die Änderungsartefakte ab und
+„searches codebase for implementation evidence" — als Hinweis: „Does not block archive".
+*(Nachgeprüft am 29. Oktober 2026 in `docs/reference/agentic-sdd.md` bzw. `docs/commands.md` der
+beiden Repositorien.)*
 
-Das ist kein Versäumnis, sondern eine andere Zielgruppe. Die Frameworks sind für Entwicklungstempo
+Was diese Sammlung darüber hinaus verlangt:
+
+- **Den Beleg als Artefakt.** Zu jedem Kriterium die Befehlsausgabe, den Protokollauszug, den
+  Fundort — in der Sprint-Datei abgelegt, nicht nur als Urteil eines Prüflaufs.
+- **Eine Sperre statt eines Hinweises.** Was nie passieren darf, entscheidet ein Hook mit Exit-Code
+  (Abschnitt 4), nicht ein Bericht, den man zur Kenntnis nimmt.
+- **Benannte Zuständigkeiten.** Datenklassen, Zugangsrückgabe, Änderungsklassen mit benannter
+  Freigabe und eine Tabelle für ausgelassene Schritte mit der Person, die das Restrisiko
+  abgenommen hat.
+
+Das ist kein Versäumnis der Frameworks, sondern eine andere Zielgruppe. Die Frameworks sind für Entwicklungstempo
 gebaut. Diese Sammlung ist in Kundenarbeit entstanden, in der jemand später fragt: Welche Daten?
 Wer durfte schreiben? Wer hat freigegeben? Was wurde ausgelassen? Wer die Antworten erst in der
 Woche vor dem Assessment rekonstruiert, zahlt sie doppelt.
