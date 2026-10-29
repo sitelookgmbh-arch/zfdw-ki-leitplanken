@@ -13,6 +13,10 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
 - **Dependabot für GitHub Actions** (`.github/dependabot.yml`): monatlich, gebündelt in einem PR. Die SHA-Pins der CI veralten sonst still.
 
 ### Fixed
+- **Guard: `git -C <pfad> add` misst im Zielverzeichnis.** `git -C sub add .` blockte, sobald im
+  Repo-Stamm eine unverfolgte `.env` lag, obwohl der Befehl nur `sub/` erfasst. Genau ein `-C` mit
+  wörtlichem Pfad wird jetzt gelesen und dort gemessen (`git -C <pfad> add --dry-run -- …`).
+  Fail-closed: mehrere `-C`, Variablen, Substitution, Ketten, fehlendes Verzeichnis → breit wie bisher.
 - **Claude-Code-Vorlage:** `hooks/settings.json.vorlage` ruft Guard und Stop-Hook über
   `"$CLAUDE_PROJECT_DIR"` auf statt relativ. Claude Code startet Hooks im aktuellen
   Arbeitsverzeichnis; nach einem `cd` in einen Unterordner fand der relative Pfad den Guard

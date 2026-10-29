@@ -132,9 +132,12 @@ zerlege() {
 # Eine Pfadangabe, die gezielt gemessen werden darf: woertlich, ohne
 # git-Pathspec-Magie (:/, :(glob)…), ohne Platzhalter, nicht "." und nicht leer.
 # Alles andere misst der Guard breit.
+# Ausnahme: Nach einem gelesenen `git -C <pfad>` gilt "." als messbar. Dann
+# misst der Guard ohnehin im Zielverzeichnis, und "." ist genau dieses.
 gezielt_messbar() {
   case "$1" in
-    '' | . | :* | *[*?[]*) return 1 ;;
+    .) [ "$mit_c" -eq 1 ] && return 0; return 1 ;;
+    '' | :* | *[*?[]*) return 1 ;;
   esac
   return 0
 }
@@ -145,6 +148,7 @@ gezielt_messbar() {
 messart=alt
 mess_optionen=()
 pfade=()
+mit_c=0   # 1, wenn genau ein woertliches `git -C <pfad>` gelesen wurde
 
 pruefe_add() { # wertet tok[2..] eines `git add` aus
   local a nach_dd=0 zwang=0 nur_verfolgt=0 breit=0
@@ -207,6 +211,22 @@ pruefe_commit() { # wertet tok[2..] eines `git commit` aus
 
 if [ "$modus" = hook ]; then
   if zerlege "$befehl" && [ "${tok[0]:-}" = git ]; then
+    # Genau ein vorangestelltes `git -C <pfad>` mit woertlichem Pfad: git
+    # wechselt vor dem Unterbefehl in <pfad>, dort gelten Pfade und ".". Der
+    # Guard misst dann ebenda. Nur wenn das Verzeichnis existiert; sonst bleibt
+    # tok unveraendert, tok[1] ist "-C", und es gilt messart=alt (breit).
+    # Ein zweites -C oder eine weitere globale Option steht danach in tok[1]
+    # und faellt ebenso auf alt — mehrere -C werden nicht verrechnet.
+    if [ "${tok[1]:-}" = -C ] && [ "${#tok[@]}" -ge 4 ] && [ -n "${tok[2]}" ]; then
+      case "${tok[2]}" in
+        /*) ziel="${tok[2]}" ;;
+        *) ziel="$befehl_ort/${tok[2]}" ;;
+      esac
+      if [ -d "$ziel" ]; then
+        befehl_ort="$ziel"; mit_c=1
+        tok=(git "${tok[@]:3}")
+      fi
+    fi
     case "${tok[1]:-}" in
       add) pruefe_add ;;
       commit) pruefe_commit ;;

@@ -14,8 +14,8 @@ darf. Begründung: [04 — Deterministische Guards](../methode/04_Deterministisc
 | `codex-hooks.json.vorlage` | — | Verdrahtung des Guards für Codex (`.codex/hooks.json`) |
 | `pre-commit.vorlage` | git pre-commit | Derselbe Guard mit `--staged`: prüft den Index, greift bei jedem, der committet |
 | `geschuetzte-pfade.vorlage` | — | Schutzmuster, projektspezifisch zu setzen |
-| `tests/test-guard.sh` | — | 48 Fälle, davon 15 bewusste Nicht-Treffer — inkl. gezieltem `git add`, `git -C`, Codex-Eingabeformat, `--staged` und der Verdrahtung beider Vorlagen aus einem Unterordner |
-| `tests/rot-beweis.sh` | — | Rot-Beweis: 11 absichtlich kaputte Guards, die Suite muss jeden bemerken |
+| `tests/test-guard.sh` | — | 57 Fälle, davon 18 bewusste Nicht-Treffer — inkl. gezieltem `git add`, `git -C <pfad>` (gemessen im Zielverzeichnis), Codex-Eingabeformat, `--staged` und der Verdrahtung beider Vorlagen aus einem Unterordner |
+| `tests/rot-beweis.sh` | — | Rot-Beweis: 14 absichtlich kaputte Guards, die Suite muss jeden bemerken |
 
 ## Einbau
 
@@ -92,6 +92,7 @@ Zusammenhang nicht.
 | `git add -u` · `--update` | nur bereits Verfolgtes | `git add -u --dry-run` |
 | `git commit -a` · `-am` | nur bereits Verfolgtes | `git add -u --dry-run` |
 | `git add <pfad> …` · `git add -- <pfad>` | nur diese Pfade | `git add --dry-run -- <pfad> …` |
+| `git -C <ziel> add <pfad> …` · `git -C <ziel> add .` | nur diese Pfade, relativ zu `<ziel>` | `git -C <ziel> add --dry-run -- <pfad> …` |
 | `git commit <pfad> …` · `-i`/`-o <pfad>` | nur diese Pfade, nur Verfolgtes | `git add -u --dry-run -- <pfad> …` |
 | alles, was sich nicht sicher zerlegen lässt | unbekannt | wie oben breit: `-A` (bzw. `-u` bei `-u`/`commit`) |
 
@@ -101,8 +102,12 @@ herumliegender, unverfolgter `.env` — und ebenso `git add notiz.md` neben ders
 **Gezielt messen heißt nicht raten.** Gezielt gemessen wird nur ein schlichter Befehl
 `git add|commit …` mit wörtlichen Pfaden. Kette (`&&`, `;`, `|`), Umleitung, `$VARIABLE`, `$(…)`,
 Backticks, Backslash, Platzhalter (`*`, `?`, `[`), Tilde, Pathspec-Magie (`:/`), `.`,
-`xargs`, vorangestellte globale Optionen (`git -C <pfad> add`) oder unbekannte Optionen: Dann misst
-der Guard so breit wie zuvor. Der Fix darf Fehlalarme abbauen, aber nie Schutz. Den Ort des
+`xargs`, vorangestellte globale Optionen oder unbekannte Optionen: Dann misst der Guard so breit
+wie zuvor. Einzige gelesene globale Option ist **genau ein** `git -C <ziel>` mit wörtlichem Pfad
+zu einem vorhandenen Verzeichnis: Dann misst der Guard in `<ziel>` (relativ zu `cwd`), und dort
+gilt auch `.` als gezielt messbar — `git -C sub add .` erfasst eine `.env` im Stamm nicht und
+blockt deshalb auch nicht. Mehrere `-C`, `-C` neben weiteren globalen Optionen, ein `-C`-Pfad aus
+Variable oder Substitution oder ein fehlendes Zielverzeichnis: breit wie zuvor. Der Fix darf Fehlalarme abbauen, aber nie Schutz. Den Ort des
 Befehls liest er aus dem Feld `cwd`, das Claude Code und Codex mitliefern; ohne dieses Feld gilt das
 Arbeitsverzeichnis des Hooks. Nebenbei erfasst die gezielte Messung `git add -f` auf eine
 ignorierte Datei, die die breite Messung übersieht. Ein **leeres** Messergebnis ist ein Ergebnis („nichts

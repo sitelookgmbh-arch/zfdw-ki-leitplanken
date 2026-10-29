@@ -69,6 +69,14 @@ mutante "unlesbarer Befehl durchgelassen" '{sub(/if zerlege "\$befehl" && /, "ze
 mutante "git -C <pfad> add nicht erkannt" '/^  GIT_VOR=/{print; print "  GIT_VOR=\"(^|[;&|]|\\\\s)git\\\\s+(-[^ ]+\\\\s+)*\""; next} {print}'
 # 11. git commit mit Pfadangaben stagt nichts (fruehere Annahme).
 mutante "commit-Pfade nicht gemessen" '{sub(/mess_optionen\+=\(-u\); messart=gezielt/, "messart=keine")} {print}'
+# 12. git -C <pfad> misst wieder im Repo-Stamm statt im Zielverzeichnis
+#     (Fehlalarm bei git -C sub add . neben einer .env im Stamm).
+mutante "git -C misst im Stamm" '{sub(/befehl_ort="\$ziel"; mit_c=1/, "mit_c=1")} {print}'
+# 13. Relativer -C-Pfad gegen das Hook-Verzeichnis statt gegen cwd aufgeloest.
+mutante "git -C relativ zum Hook statt cwd" '{sub(/ziel="\$befehl_ort\/\$\{tok\[2\]\}"/, "ziel=\"$PWD/${tok[2]}\"")} {print}'
+# 14. Mehrere -C werden verrechnet, als zaehle nur das erste (fail-open:
+#     git -C sub -C .. add . erfasst den Stamm, gemessen wuerde nur sub/).
+mutante "mehrere -C: nur das erste zaehlt" '{sub(/tok=\(git "\$\{tok\[@\]:3\}"\)/, "tok=(git \"${tok[@]:3}\"); while [ \"${tok[1]:-}\" = -C ]; do tok=(git \"${tok[@]:3}\"); done")} {print}'
 
 echo
 echo "$erkannt erkannt, $blind blind"
