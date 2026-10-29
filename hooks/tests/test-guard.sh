@@ -124,7 +124,21 @@ mit_ort "cwd Unterordner, add ../.env"        2 "$arbeitsplatz/docs" "git add ..
 echo
 echo "Globale git-Optionen vor add (git -C):"
 pruefe "git -C . add -A mit .env"             2 "git -C . add -A"
-pruefe "git -C sub add . mit .env"            2 "git -C sub add ."
+# git -C <pfad> mit woertlichen Argumenten: gemessen wird im Zielverzeichnis.
+# Die .env im Stamm liegt ausserhalb von sub/ — git -C sub add . erfasst sie nicht.
+pruefe "git -C sub add . , .env nur im Stamm"  0 "git -C sub add ."
+pruefe "git -C sub add x.md, .env im Stamm"   0 "git -C sub add x.md"
+mit_ort "cwd docs, git -C ../sub add ."       0 "$arbeitsplatz/docs" "git -C ../sub add ."
+pruefe "git -C sub add ../.env"               2 "git -C sub add ../.env"
+echo "GEHEIM=1" > sub/.env
+pruefe "git -C sub add . , .env in sub/"      2 "git -C sub add ."
+rm -f sub/.env
+# Unsichere Formen bleiben breit gemessen (fail-closed).
+pruefe "git -C per Variable: breit"           2 'git -C "$ZIEL" add .'
+pruefe "git -C per Substitution: breit"       2 'git -C "$(echo sub)" add .'
+pruefe "git -C in Kette: breit"               2 "true && git -C sub add ."
+pruefe "mehrere -C: breit"                    2 "git -C sub -C .. add ."
+pruefe "git -C ohne Verzeichnis: breit"       2 "git -C fehlt add ."
 rm -f .env
 # Ignorierte .env: breites add laesst sie liegen, add -f nimmt sie trotzdem.
 echo ".env" > .gitignore && echo "GEHEIM=1" > .env
