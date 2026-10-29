@@ -24,6 +24,12 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
   Sammlung zusätzlich verlangt.
 
 ### Fixed
+- **Sicherheitsfix im Guard:** Unquotierte Kommandosubstitutionen mit Leerzeichen
+  (etwa `git -C $(echo sub) add .`) konnten den Vorfilter umgehen. Dollarzeichen und
+  Backticks erzwingen jetzt eine breite Messung, ohne die Expansion auszuführen.
+  Diese Messung verwendet das Repo aus dem Eingabefeld `cwd` statt des Prozessverzeichnisses;
+  fehlendes oder ungültiges `cwd` blockiert prüfpflichtige Befehle. Zwölf zusätzliche
+  Regressionstests und zwei zusätzliche Mutanten sichern beide Fehler ab.
 - **Herkunfts-Gate fail-closed** (`werkzeuge/herkunft-check.sh`): Das Gate wertete nur aus, ob
   die Trefferliste leer war, und verschluckte Fehler von grep. Ein ungültiges Muster in der
   Begriffsliste (etwa `[`), ein Ziel, das es nicht gibt, oder eine unlesbare Datei im Baum

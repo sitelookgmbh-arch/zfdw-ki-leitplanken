@@ -23,7 +23,8 @@ mkdir -p src && echo "code" > src/app.ts
 
 pruefe() { # name  erwarteter_code  befehl
   local name="$1" erwartet="$2" befehl="$3" code
-  printf '{"tool_name":"Bash","tool_input":{"command":%s}}' "$(printf '%s' "$befehl" | sed 's/\\/\\\\/g; s/"/\\"/g; s/^/"/; s/$/"/')" \
+  jq -n --arg cwd "$PWD" --arg command "$befehl" \
+    '{cwd: $cwd, tool_name: "Bash", tool_input: {command: $command}}' \
     | "$GUARD" >/dev/null 2>&1
   code=$?
   if [ "$code" -eq "$erwartet" ]; then
@@ -132,6 +133,13 @@ mit_ort "cwd docs, git -C ../sub add ."       0 "$arbeitsplatz/docs" "git -C ../
 pruefe "git -C sub add ../.env"               2 "git -C sub add ../.env"
 echo "GEHEIM=1" > sub/.env
 pruefe "git -C sub add . , .env in sub/"      2 "git -C sub add ."
+pruefe "git -C Substitution unquotiert"        2 'git -C $(echo sub) add .'
+pruefe "git -C Backticks unquotiert"           2 'git -C `echo sub` add .'
+pruefe "git -C Backticks quotiert"             2 'git -C "`echo sub`" add .'
+pruefe "git -C Variable unquotiert"            2 'git -C $ZIEL add .'
+pruefe "Variable als Unterbefehl"              2 'git $AKTION .'
+pruefe "Substitution vor git"                 2 '$(echo git) add .'
+pruefe "Substitution mit add -u bleibt breit"  2 'git -C $(echo sub) add -u'
 rm -f sub/.env
 # Unsichere Formen bleiben breit gemessen (fail-closed).
 pruefe "git -C per Variable: breit"           2 'git -C "$ZIEL" add .'
@@ -146,6 +154,23 @@ pruefe "add -f auf ignorierte .env"           2 "git add -f .env"
 pruefe "add .gitignore neben ignorierter .env" 0 "git add .gitignore"
 rm -f .env .gitignore
 rm -rf docs sub
+
+echo
+echo "Messung im cwd statt im Hook-Prozessverzeichnis:"
+mkdir -p fremd
+git init -q fremd
+echo "GEHEIM=1" > fremd/.env
+hook_ort=$(mktemp -d)
+ohne_repo=$(mktemp -d)
+git init -q "$hook_ort"
+cd "$hook_ort" || exit 1
+mit_ort "anderes Repo im cwd, Bulk-Add" 2 "$arbeitsplatz/fremd" "git add -A"
+mit_ort "cwd ohne Repo blockt" 2 "$ohne_repo" "git add -A"
+mit_ort "cwd fehlt blockt" 2 "" "git add -A"
+mit_ort "cwd existiert nicht blockt" 2 "$arbeitsplatz/fehlt" "git add -A"
+mit_ort "cwd relativ blockt" 2 "fremd" "git add -A"
+cd "$arbeitsplatz" || exit 1
+rm -rf "$hook_ort" "$ohne_repo" fremd
 
 echo
 echo "Codex-Eingabeformat:"
