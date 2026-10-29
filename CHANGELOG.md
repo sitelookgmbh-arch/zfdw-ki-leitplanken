@@ -12,6 +12,17 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
   Datei erkennbar ist.
 - **Dependabot für GitHub Actions** (`.github/dependabot.yml`): monatlich, gebündelt in einem PR. Die SHA-Pins der CI veralten sonst still.
 
+### Changed
+- **Guard und pre-commit-Hook als Standardpaar** (README „Anfangen", `hooks/README.md`): Der
+  Schnelleinstieg richtet beide ein. Ein `git commit -m …` über eine bereits gestagte geschützte
+  Datei lässt der Werkzeug-Guard durch; das fängt nur der pre-commit-Hook. Dazu der Hinweis, dass
+  `--no-verify` lokale Hooks umgeht und serverseitige Prüfungen die Schicht darüber sind — ohne
+  Versprechen einer Sperre gegen jeden Datenabfluss.
+- **Methode 07 und 08: Abgrenzung an den Quellen nachgeprüft.** SpecKit (`checklist`, `analyze`)
+  prüft Spezifikationsgüte, OpenSpec (`/opsx:verify`) gleicht Umsetzung gegen Artefakte ab. Statt
+  „die anderen prüfen das nicht" steht jetzt, welche Belege, Sperren und Zuständigkeiten diese
+  Sammlung zusätzlich verlangt.
+
 ### Fixed
 - **Herkunfts-Gate fail-closed** (`werkzeuge/herkunft-check.sh`): Das Gate wertete nur aus, ob
   die Trefferliste leer war, und verschluckte Fehler von grep. Ein ungültiges Muster in der
@@ -26,6 +37,8 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
   Repo-Stamm eine unverfolgte `.env` lag, obwohl der Befehl nur `sub/` erfasst. Genau ein `-C` mit
   wörtlichem Pfad wird jetzt gelesen und dort gemessen (`git -C <pfad> add --dry-run -- …`).
   Fail-closed: mehrere `-C`, Variablen, Substitution, Ketten, fehlendes Verzeichnis → breit wie bisher.
+- **Methode 05:** nannte „sieben Mutanten", `hooks/tests/rot-beweis.sh` baut inzwischen mehr. Die
+  Methode nennt keine feste Zahl mehr und verweist auf Skript und Ausgabe.
 - **Claude-Code-Vorlage:** `hooks/settings.json.vorlage` ruft Guard und Stop-Hook über
   `"$CLAUDE_PROJECT_DIR"` auf statt relativ. Claude Code startet Hooks im aktuellen
   Arbeitsverzeichnis; nach einem `cd` in einen Unterordner fand der relative Pfad den Guard

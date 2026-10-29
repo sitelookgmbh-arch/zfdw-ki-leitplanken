@@ -19,12 +19,16 @@ darf. Begründung: [04 — Deterministische Guards](../methode/04_Deterministisc
 
 ## Einbau
 
+Werkzeug-Guard und pre-commit-Hook sind das **Standardpaar** — der eine ohne den anderen lässt
+eine bekannte Lücke offen (siehe [Grenzen](#grenzen)):
+
 ```bash
 mkdir -p .claude/hooks
 cp hooks/guard-geschuetzte-daten.sh hooks/stop-git-status.sh .claude/hooks/
 chmod +x .claude/hooks/*.sh
 cp hooks/settings.json.vorlage .claude/settings.json
 cp hooks/geschuetzte-pfade.vorlage .claude/geschuetzte-pfade
+cp hooks/pre-commit.vorlage .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
 ```
 
 **Die Vorlage ruft die Hooks über `"$CLAUDE_PROJECT_DIR"` auf, nicht über einen relativen Pfad.**
@@ -64,11 +68,17 @@ schützt er gar nichts mehr.
 - **Er prüft das Hinzufügen, nicht das Hinausgehen.** `git push` von Dateien, die bereits verfolgt
   sind, Kopieren, Hochladen, Einfügen in ein Chatfenster, Netzwerkaufrufe: Datenabfluss außerhalb
   von `git add`/`git commit` deckt er nicht ab.
-- **Deshalb ist er eine Schicht, nicht die Sicherung.** Der pre-commit-Hook (`--staged`) schließt
-  einen Teil der Lücke, weil er bei jedem Commit greift, egal wer ihn auslöst — und ist mit
-  `--no-verify` umgehbar. Was garantiert nicht ins entfernte Repo gelangen darf, braucht zusätzlich
-  eine serverseitige Prüfung: ein Secret-Scanner in CI (z. B. gitleaks) und Branch-Schutz, der
-  Pushes ohne diese Prüfung abweist.
+- **Er prüft den Befehl, nicht den Index.** Ein schlichtes `git commit -m …` über eine geschützte
+  Datei, die bereits gestagt ist, lässt er durch (Exit 0) — der Befehl selbst fügt nichts hinzu.
+  Diesen Fall fängt der pre-commit-Hook (`--staged`), der den Index prüft. Deshalb gehören beide
+  zusammen.
+- **Deshalb ist er eine Schicht, nicht die Sicherung.** Der pre-commit-Hook schließt einen Teil der
+  Lücke, weil er bei jedem Commit greift, egal wer ihn auslöst — und ist wie jeder lokale Hook mit
+  `git commit --no-verify` umgehbar. Was garantiert nicht ins entfernte Repo gelangen darf, braucht
+  die Schicht darüber auf dem Server: Secret-Scanning mit Push-Schutz, ein Secret-Scanner in CI
+  (z. B. gitleaks) als verpflichtender Statuscheck und Branch-Schutz, der ohne diese Prüfung nicht
+  mergen lässt. Auch alle Schichten zusammen sind keine Sperre gegen jeden Datenabfluss: Was nicht
+  über `git add`/`git commit` läuft, sehen sie nicht (siehe oben).
 - Der Guard prüft, was ein Befehl **bewirken** würde — nicht, was jemand meint. Gegen eine falsche
   fachliche Entscheidung hilft er nicht.
 - Er unterscheidet nicht, ob `git add` ein Befehl oder Teil eines Zitats ist. Liegt gleichzeitig eine

@@ -86,8 +86,8 @@ werkzeuge/   Herkunfts-Gate: prüft vor einer Veröffentlichung auf Kundenbezug
 
 Nicht alles auf einmal. Die Reihenfolge, die sich bewährt hat:
 
-**1. Der Guard, bevor irgendetwas anderes.** Er ist der einzige Teil, dessen Fehlen echten Schaden
-anrichten kann:
+**1. Der Guard, bevor irgendetwas anderes — als Paar mit dem pre-commit-Hook.** Er ist der einzige
+Teil, dessen Fehlen echten Schaden anrichten kann:
 
 ```bash
 mkdir -p .claude/hooks
@@ -95,9 +95,19 @@ cp hooks/guard-geschuetzte-daten.sh hooks/stop-git-status.sh .claude/hooks/
 chmod +x .claude/hooks/*.sh
 cp hooks/settings.json.vorlage .claude/settings.json
 cp hooks/geschuetzte-pfade.vorlage .claude/geschuetzte-pfade
+cp hooks/pre-commit.vorlage .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
 hooks/tests/test-guard.sh
 hooks/tests/rot-beweis.sh   # zeigt, dass die Suite einen kaputten Guard bemerkt
 ```
+
+Beide gehören zusammen. Der Werkzeug-Guard prüft den **Befehl** des Assistenten: Er blockt
+`git add` und `git commit -a`, die eine geschützte Datei erfassen würden. Ein schlichtes
+`git commit -m …` über eine Datei, die schon im Index liegt, lässt er durch — das fängt erst der
+pre-commit-Hook, der den **Index** prüft. Beide sind lokal und mit `git commit --no-verify` bzw.
+an der Shell des Assistenten vorbei umgehbar. Die Schicht darüber liegt auf dem Server:
+Secret-Scanning mit Push-Schutz und verpflichtende Statuschecks vor dem Merge. Zusammen senken die
+drei das Risiko; eine Sperre gegen jeden Datenabfluss ist keine davon
+(siehe [hooks/README.md](hooks/README.md#grenzen)).
 
 Dann die Schutzmuster auf dein Projekt setzen. Die Vorgaben decken Secrets ab, **nicht deine
 Kundendaten**.
