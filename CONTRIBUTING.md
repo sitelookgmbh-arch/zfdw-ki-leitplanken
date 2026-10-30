@@ -14,6 +14,9 @@ kostet.
 ## Pull-Requests
 
 - **Ein Thema pro PR.** Commits nach [Conventional Commits](https://www.conventionalcommits.org/de/v1.0.0/).
+- **Changelog als Fragment.** Neue PRs ergänzen nur `changelog.d/<slug>.md`, nicht
+  `CHANGELOG.md`. Getrennte Dateien vermeiden Konflikte zwischen parallelen Beiträgen.
+  Format und bewusster Sammelschritt: [changelog.d/README.md](changelog.d/README.md).
 - **Deutsch.** Die Sammlung ist durchgehend deutsch; gemischte Sprachen driften auseinander.
 - **Begründung statt Behauptung.** Jede Regel hier hat einen Absatz, der sagt, was ohne sie schiefgeht.
   Eine neue Regel ohne diesen Absatz wird nicht aufgenommen — auch wenn sie richtig ist.
