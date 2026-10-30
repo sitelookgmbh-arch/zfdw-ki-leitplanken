@@ -80,7 +80,7 @@ if [ "$modus" = hook ]; then
   # Wo der Befehl laeuft: Claude Code und Codex liefern das Feld cwd. Relative
   # Pfade im Befehl gelten dort, nicht zwingend im Arbeitsverzeichnis des Hooks.
   befehl_ort=$(printf '%s' "$eingabe" | jq -r '.cwd // empty' 2>/dev/null)
-  [ -n "$befehl_ort" ] && [ -d "$befehl_ort" ] || befehl_ort="$PWD"
+  mess_ort="$befehl_ort"
 
   # Nur Befehle interessieren, die etwas in die Versionsverwaltung bringen
   # koennen: git add in jeder Form — und git commit, das mit -a oder mit
@@ -88,9 +88,18 @@ if [ "$modus" = hook ]; then
   # Unterbefehl ab, auch solche mit Wert (`git -C <pfad> add`, `git -c k=v add`).
   # Lieber eine Option zu viel als Wert lesen als einen git-Aufruf uebersehen.
   GIT_VOR='(^|[;&|]|\s)git\s+(-\S*(\s+("[^"]*"|'"'"'[^'"'"']*'"'"'|[^-[:space:];&|]\S*))?\s+)*'
-  printf '%s' "$befehl" | grep -qE "${GIT_VOR}add(\s|$)" \
+  # Expansionen werden nie ausgefuehrt. Sie koennen auch den Unterbefehl
+  # liefern; deshalb unabhaengig vom woertlichen git-Muster breit messen.
+  substitution=0
+  case "$befehl" in *['$`']*) substitution=1 ;; esac
+  [ "$substitution" -eq 1 ] \
+    || printf '%s' "$befehl" | grep -qE "${GIT_VOR}add(\s|$)" \
     || printf '%s' "$befehl" | grep -qE "${GIT_VOR}commit(\s|$)" \
     || exit 0
+  case "$mess_ort" in
+    /*) [ -d "$mess_ort" ] || { echo "BLOCKIERT — cwd ist kein vorhandenes Verzeichnis." >&2; exit 2; } ;;
+    *) echo "BLOCKIERT — cwd fehlt oder ist ungueltig." >&2; exit 2 ;;
+  esac
 fi
 
 # zerlege BEFEHL — zerlegt einen EINFACHEN Befehl in Woerter (Array tok).
@@ -210,7 +219,7 @@ pruefe_commit() { # wertet tok[2..] eines `git commit` aus
 }
 
 if [ "$modus" = hook ]; then
-  if zerlege "$befehl" && [ "${tok[0]:-}" = git ]; then
+  if [ "$substitution" -eq 0 ] && zerlege "$befehl" && [ "${tok[0]:-}" = git ]; then
     # Genau ein vorangestelltes `git -C <pfad>` mit woertlichem Pfad: git
     # wechselt vor dem Unterbefehl in <pfad>, dort gelten Pfade und ".". Der
     # Guard misst dann ebenda. Nur wenn das Verzeichnis existiert; sonst bleibt
@@ -236,7 +245,13 @@ if [ "$modus" = hook ]; then
   [ "$messart" = keine ] && exit 0
 fi
 
-repo_wurzel=$(git rev-parse --show-toplevel 2>/dev/null) || exit 0
+if [ "$modus" = hook ]; then
+  cd "$mess_ort" || { echo "BLOCKIERT — Wechsel nach cwd gescheitert; Befehl nicht messbar." >&2; exit 2; }
+fi
+repo_wurzel=$(git rev-parse --show-toplevel 2>/dev/null) || {
+  [ "$modus" = hook ] && { echo "BLOCKIERT — Repo aus cwd nicht bestimmbar; Befehl nicht messbar." >&2; exit 2; }
+  exit 0
+}
 cd "$repo_wurzel" || exit 0
 
 musterdatei=".claude/geschuetzte-pfade"
@@ -271,7 +286,9 @@ else
   if [ "$messart" = alt ]; then
     # Wie vor der gezielten Messung: -u bzw. commit -a misst Verfolgtes, jedes
     # andere git add alles, ein unlesbares git commit (Pfade moeglich) Verfolgtes.
-    if printf '%s' "$befehl" | grep -qE "${GIT_VOR}add\s+(-u|--update)(\s|$)" \
+    if [ "$substitution" -eq 1 ]; then
+      messart=breit_A
+    elif printf '%s' "$befehl" | grep -qE "${GIT_VOR}add\s+(-u|--update)(\s|$)" \
        || printf '%s' "$befehl" | grep -qE "${GIT_VOR}commit([^;&|]*)?\s-[A-Za-z]*a"; then
       messart=breit_u
     elif printf '%s' "$befehl" | grep -qE "${GIT_VOR}add(\s|$)"; then

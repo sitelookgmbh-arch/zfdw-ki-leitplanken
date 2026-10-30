@@ -31,6 +31,10 @@ mutante() { # name  awk-programm
   local name="$1" programm="$2" datei
   datei="$werkstatt/$(printf '%s' "$name" | tr -c 'a-z0-9' '_').sh"
   awk "$programm" "$original" > "$datei"
+  if ! bash -n "$datei"; then
+    printf '  ????  %s: Mutante syntaktisch ungueltig\n' "$name"
+    blind=$((blind+1)); return
+  fi
   chmod +x "$datei"
   if cmp -s "$datei" "$original"; then
     printf '  ????  %-44s Mutation hat nichts geaendert — Mutante pruefen\n' "$name"
@@ -63,7 +67,7 @@ mutante ".codex-Musterdatei uebersehen" '{sub(/ \.codex\/geschuetzte-pfade/, "")
 mutante "gezieltes add misst mit -A" '/add --dry-run \$\{mess_optionen/{print "    roh=$(git add -A --dry-run 2>/dev/null); rc=$?"; next} {print}'
 # 9. Fail-closed beim Parsen entfernt: was sich nicht zerlegen laesst, wird
 #    durchgelassen statt breit gemessen ($(…), Ketten).
-mutante "unlesbarer Befehl durchgelassen" '{sub(/if zerlege "\$befehl" && /, "zerlege \"$befehl\" || exit 0; if ")} {print}'
+mutante "unlesbarer Befehl durchgelassen" '/if .*zerlege "\$befehl" && /{print "  zerlege \"$befehl\" || exit 0; if [ \"${tok[0]:-}\" = git ]; then"; next} {print}'
 # 10. Globale Optionen mit Wert (git -C <pfad> add) werden uebersprungen —
 #     altes Erkennungsmuster.
 mutante "git -C <pfad> add nicht erkannt" '/^  GIT_VOR=/{print; print "  GIT_VOR=\"(^|[;&|]|\\\\s)git\\\\s+(-[^ ]+\\\\s+)*\""; next} {print}'
@@ -77,6 +81,14 @@ mutante "git -C relativ zum Hook statt cwd" '{sub(/ziel="\$befehl_ort\/\$\{tok\[
 # 14. Mehrere -C werden verrechnet, als zaehle nur das erste (fail-open:
 #     git -C sub -C .. add . erfasst den Stamm, gemessen wuerde nur sub/).
 mutante "mehrere -C: nur das erste zaehlt" '{sub(/tok=\(git "\$\{tok\[@\]:3\}"\)/, "tok=(git \"${tok[@]:3}\"); while [ \"${tok[1]:-}\" = -C ]; do tok=(git \"${tok[@]:3}\"); done")} {print}'
+
+# Expansionserkennung entfernen: wieder nur der alte Vorfilter.
+mutante "Substitution im Vorfilter uebersehen" '/case "\$befehl" in .*substitution=1/{next} {print}'
+# Breite Messung wieder im Prozessverzeichnis.
+mutante "breite Messung ignoriert cwd" '/cd "\$mess_ort" \|\|/{print "  :"; next} {print}'
+
+# Blockcodes allein reichen nicht: Ohne Begruendung ist die Sperre stumm.
+mutante "cwd-Blockgruende fehlen" '{gsub(/echo "BLOCKIERT — (cwd ist kein vorhandenes Verzeichnis\.|Wechsel nach cwd gescheitert; Befehl nicht messbar\.|Repo aus cwd nicht bestimmbar; Befehl nicht messbar\.)" >&2; /, "")} {print}'
 
 echo
 echo "$erkannt erkannt, $blind blind"
