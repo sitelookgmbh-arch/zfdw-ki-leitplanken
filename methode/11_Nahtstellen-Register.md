@@ -58,6 +58,8 @@ eine Datei, kein Prozess.
 
 **5. Ins Register gehört nur, was ein Review an einer Datei erkennen kann.** Abläufe und
 Bedienfehler gehören ins Runbook. Ein Register, das alles aufnimmt, liest bald niemand mehr.
+Wie aus belegten Ablauffehlern technische Prüfregeln werden, beschreibt
+[12 — Lernschleife](12_Lernschleife.md).
 
 ## Grenzen
 

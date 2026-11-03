@@ -1,6 +1,6 @@
 # Methode
 
-Elf Dokumente. Jedes beantwortet eine Frage, jedes nennt zuerst das Problem und dann die Regel — wer
+Zwölf Dokumente. Jedes beantwortet eine Frage, jedes nennt zuerst das Problem und dann die Regel — wer
 nur die Regel liest, kann sie nicht sinnvoll anpassen.
 
 | Dokument | Frage | Wichtigster Satz |
@@ -16,6 +16,7 @@ nur die Regel liest, kann sie nicht sinnvoll anpassen.
 | [09 — Systembeschreibung](09_Systembeschreibung.md) | Woher weiß der Assistent, was die Anwendung überhaupt ist? | Der Nutzen dieser Ebene entsteht nicht beim Schreiben, sondern beim Gegenlesen. |
 | [10 — Fremdtext ist Daten](10_Fremdtext-ist-Daten.md) | Was tun, wenn der Assistent Text liest, den Fremde geschrieben haben? | Die Sicherung sitzt am Ausgang, nicht im Prompt. |
 | [11 — Nahtstellen-Register](11_Nahtstellen-Register.md) | Wie verhindert man, dass derselbe Fehler zwischen zwei Werkzeugen zweimal passiert? | Ein Review sieht den eigenen Diff, die teuren Fehler liegen dazwischen. |
+| [12 — Lernschleife](12_Lernschleife.md) | Wie werden belegte Fehler zu wirksamen Prüfregeln? | Ein dokumentierter Fehler ist noch kein verhinderter Fehler. |
 
 ## Reihenfolge
 
@@ -40,3 +41,7 @@ und spätestens dann, wenn so etwas zeitgesteuert ohne Menschen läuft.
 **11** gehört zu 05: Verifikation prüft eine Änderung, das Register erinnert an das, was zwischen
 Änderungen schiefging. Lohnt sich, sobald mehr als ein Werkzeug oder ein automatischer Lauf am selben
 Stand arbeitet.
+
+**12** folgt auf 11 und ergänzt es um Fehler in Abläufen: Belege sammeln, technische Gegenmittel
+vorschlagen und ihre Wirkung prüfen. Sinnvoll, sobald sich ein bereits dokumentierter Fehler
+wiederholt. Änderungen am Schutz bleiben an menschliche Freigabe gebunden.
