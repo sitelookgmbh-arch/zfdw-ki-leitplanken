@@ -89,7 +89,7 @@ if [ "$modus" = hook ]; then
   # Lieber eine Option zu viel als Wert lesen als einen git-Aufruf uebersehen.
   GIT_VOR='(^|[;&|]|\s)git\s+(-\S*(\s+("[^"]*"|'"'"'[^'"'"']*'"'"'|[^-[:space:];&|]\S*))?\s+)*'
   # Expansionen werden nie ausgefuehrt. Sie koennen auch den Unterbefehl
-  # liefern; deshalb unabhaengig vom woertlichen git-Muster breit messen.
+  # liefern; deshalb unabhaengig vom woertlichen git-Muster pruefen.
   substitution=0
   case "$befehl" in *['$`']*) substitution=1 ;; esac
   [ "$substitution" -eq 1 ] \
@@ -107,7 +107,7 @@ fi
 # Subshell, $Variable, $(…), Backticks, Backslash, Glob, Klammern, Tilde,
 # Kommentar, Zeilenumbruch ausserhalb von Anfuehrungszeichen. Bewusst eine
 # Positivliste: Was hier nicht ausdruecklich erlaubt ist, gilt als unlesbar —
-# und unlesbar heisst: so breit messen wie vor der gezielten Messung.
+# Unlesbare Kontextwechsel blockieren; andere Formen werden breit gemessen.
 zerlege() {
   local rest="$1" teil lauf wort="" begonnen=0
   tok=()
@@ -157,7 +157,7 @@ gezielt_messbar() {
 messart=alt
 mess_optionen=()
 pfade=()
-mit_c=0   # 1, wenn genau ein woertliches `git -C <pfad>` gelesen wurde
+mit_c=0   # 1, wenn mindestens ein woertliches -C gelesen wurde
 
 pruefe_add() { # wertet tok[2..] eines `git add` aus
   local a nach_dd=0 zwang=0 nur_verfolgt=0 breit=0
@@ -218,31 +218,55 @@ pruefe_commit() { # wertet tok[2..] eines `git commit` aus
   fi
 }
 
+kontext_fehler() {
+  echo "BLOCKIERT — Git-Zielkontext nicht sicher aufloesbar." >&2
+  exit 2
+}
+
 if [ "$modus" = hook ]; then
   if [ "$substitution" -eq 0 ] && zerlege "$befehl" && [ "${tok[0]:-}" = git ]; then
-    # Genau ein vorangestelltes `git -C <pfad>` mit woertlichem Pfad: git
-    # wechselt vor dem Unterbefehl in <pfad>, dort gelten Pfade und ".". Der
-    # Guard misst dann ebenda. Nur wenn das Verzeichnis existiert; sonst bleibt
-    # tok unveraendert, tok[1] ist "-C", und es gilt messart=alt (breit).
-    # Ein zweites -C oder eine weitere globale Option steht danach in tok[1]
-    # und faellt ebenso auf alt — mehrere -C werden nicht verrechnet.
-    if [ "${tok[1]:-}" = -C ] && [ "${#tok[@]}" -ge 4 ] && [ -n "${tok[2]}" ]; then
-      case "${tok[2]}" in
-        /*) ziel="${tok[2]}" ;;
-        *) ziel="$befehl_ort/${tok[2]}" ;;
+    # Kontextoptionen in Reihenfolge lesen; niemals die Eingabe ausfuehren.
+    kontext=()
+    while [ "${tok[1]:-}" != add ] && [ "${tok[1]:-}" != commit ]; do
+      case "${tok[1]:-}" in
+        -C)
+          [ "${#tok[@]}" -ge 3 ] || kontext_fehler
+          case "${tok[2]}" in
+            '') ziel="$befehl_ort" ;;
+            /*) ziel="${tok[2]}" ;;
+            *) ziel="$befehl_ort/${tok[2]}" ;;
+          esac
+          ziel=$(cd "$ziel" 2>/dev/null && pwd -P) || kontext_fehler
+          befehl_ort="$ziel"; mit_c=1
+          tok=(git "${tok[@]:3}") ;;
+        --git-dir | --work-tree)
+          [ "${#tok[@]}" -ge 3 ] && [ -n "${tok[2]}" ] || kontext_fehler
+          kontext+=("${tok[1]}=${tok[2]}")
+          tok=(git "${tok[@]:3}") ;;
+        --git-dir=* | --work-tree=*)
+          kontext+=("${tok[1]}"); tok=(git "${tok[@]:2}") ;;
+        *) kontext_fehler ;;
       esac
-      if [ -d "$ziel" ]; then
-        befehl_ort="$ziel"; mit_c=1
-        tok=(git "${tok[@]:3}")
-      fi
+    done
+    mess_ort="$befehl_ort"
+    # Git loest relative --git-dir/--work-tree nach allen -C auf. Danach
+    # absolute Werte festhalten, damit auch Messungen im Stamm gleich bleiben.
+    if [ "${#kontext[@]}" -gt 0 ]; then
+      ziel_git=$(git -C "$mess_ort" "${kontext[@]}" rev-parse --absolute-git-dir 2>/dev/null) || kontext_fehler
+      ziel_baum=$(git -C "$mess_ort" "${kontext[@]}" rev-parse --show-toplevel 2>/dev/null) || kontext_fehler
+      export GIT_DIR="$ziel_git" GIT_WORK_TREE="$ziel_baum"
     fi
     case "${tok[1]:-}" in
       add) pruefe_add ;;
       commit) pruefe_commit ;;
     esac
+  else
+    # Dynamische oder verkettete Kontextwechsel duerfen nicht im cwd messen.
+    if [ "$substitution" -eq 1 ] || printf '%s' "$befehl" | grep -qE -- '(git[[:space:]]+-|--git-dir|--work-tree| -C|(^|[;&|[:space:]])cd[[:space:]]|GIT_)'; then
+      kontext_fehler
+    fi
   fi
   # Nicht zerlegbar oder kein schlichtes `git add|commit`: messart bleibt alt.
-  [ "$messart" = keine ] && exit 0
 fi
 
 if [ "$modus" = hook ]; then
@@ -252,7 +276,8 @@ repo_wurzel=$(git rev-parse --show-toplevel 2>/dev/null) || {
   [ "$modus" = hook ] && { echo "BLOCKIERT — Repo aus cwd nicht bestimmbar; Befehl nicht messbar." >&2; exit 2; }
   exit 0
 }
-cd "$repo_wurzel" || exit 0
+cd "$repo_wurzel" || kontext_fehler
+[ "$messart" = keine ] && exit 0
 
 musterdatei=".claude/geschuetzte-pfade"
 for kandidat in .claude/geschuetzte-pfade .codex/geschuetzte-pfade .geschuetzte-pfade; do
@@ -300,8 +325,8 @@ else
 
   if [ "$messart" = gezielt ] \
      && [ "$(git -C "$befehl_ort" rev-parse --show-toplevel 2>/dev/null)" != "$repo_wurzel" ]; then
-    # Der Befehl laeuft nicht in diesem Repo: nicht gezielt messbar.
-    messart=breit_A
+    # Ein widerspruechlicher Kontext darf nicht still anders gemessen werden.
+    kontext_fehler
   fi
 
   if [ "$messart" = gezielt ]; then
@@ -319,7 +344,7 @@ else
     # Rueckfall nur bei echtem Fehlschlag (alter git, Sonderzustand, Pfad
     # existiert nicht). Ein LEERES Messergebnis ist kein Fehlschlag, sondern
     # die Aussage "nichts betroffen".
-    kandidaten=$(git status --porcelain --untracked-files=all 2>/dev/null | sed 's/^...//' | sed 's/.* -> //')
+    kandidaten=$(git status --porcelain --untracked-files=all 2>/dev/null | sed 's/^...//' | sed 's/.* -> //') || kontext_fehler
   else
     # Zeilenformat: add 'pfad' / remove 'pfad'. Nur Hinzufuegen interessiert.
     kandidaten=$(printf '%s\n' "$roh" | sed -n "s/^add '\(.*\)'$/\1/p")

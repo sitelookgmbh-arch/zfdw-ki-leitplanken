@@ -261,5 +261,6 @@ fi
 rm -f .env
 
 echo
+if ! GUARD="$GUARD" "$VORLAGEN/tests/test-git-kontext.sh"; then fehl=$((fehl+1)); fi
 echo "$ok bestanden, $fehl fehlgeschlagen"
 [ "$fehl" -eq 0 ]

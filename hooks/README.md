@@ -14,8 +14,8 @@ darf. Begründung: [04 — Deterministische Guards](../methode/04_Deterministisc
 | `codex-hooks.json.vorlage` | — | Verdrahtung des Guards für Codex (`.codex/hooks.json`) |
 | `pre-commit.vorlage` | git pre-commit | Derselbe Guard mit `--staged`: prüft den Index, greift bei jedem, der committet |
 | `geschuetzte-pfade.vorlage` | — | Schutzmuster, projektspezifisch zu setzen |
-| `tests/test-guard.sh` | — | 72 Fälle, davon 19 mit erwartetem Exit 0 — inkl. gezieltem `git add`, `git -C <pfad>` (gemessen im Zielverzeichnis), Codex-Eingabeformat, `--staged` und der Verdrahtung beider Vorlagen aus einem Unterordner |
-| `tests/rot-beweis.sh` | — | Rot-Beweis: 17 absichtlich kaputte Guards, die Suite muss jeden bemerken |
+| `tests/test-guard.sh` | — | 72 bestehende Fälle plus separate Kontextproben mit zwei Repos — inkl. gezieltem `git add`, `git -C <pfad>` (gemessen im Zielverzeichnis), Codex-Eingabeformat, `--staged` und der Verdrahtung beider Vorlagen aus einem Unterordner |
+| `tests/rot-beweis.sh` | — | Rot-Beweis: absichtlich kaputte Guards, die Suite muss jeden bemerken |
 
 ## Einbau
 
@@ -83,15 +83,18 @@ schützt er gar nichts mehr.
   fachliche Entscheidung hilft er nicht.
 - Er unterscheidet nicht, ob `git add` ein Befehl oder Teil eines Zitats ist. Liegt gleichzeitig eine
   geschützte Datei im Arbeitsbaum, blockt er auch dann. Bewusst so.
-- **`git -C <pfad> add` außerhalb des eigenen Repos** misst er im Repo aus `cwd`, nicht im
-  fremden. Erkannt und breit gemessen wird der Befehl, gegen ein fremdes Repo schützt er nicht.
-- **Expansionen werden nicht ausgewertet.** Sobald `$` oder Backticks im Befehl stehen,
-  misst er breit mit `-A`, auch ohne wörtlich erkennbares `git add`. Das erfasst unquotierte
-  Substitutionen mit Leerzeichen und variable Unterbefehle, kann aber auch harmlose Befehle
-  oder wörtlich zitierte Dollarzeichen blockieren. Das Ziel einer dynamischen Verzeichniswahl
-  außerhalb des Repos aus `cwd` kann diese Messung nicht bestimmen. Liegt `cwd` außerhalb
-  eines Repos, blockt er deshalb auch Befehle ohne git wie `echo "$HOME"` mit Exit 2
-  und einer Begründung auf stderr.
+- **Reichweite des Git-Kontexts:** Wörtliche `-C` werden nacheinander aufgelöst,
+  relative Ziele jeweils vom vorherigen Verzeichnis aus, absolute Ziele unabhängig davon.
+  Ein leeres `-C` lässt den Ort unverändert. Repo-Wurzel, Schutzmuster und Messungen stammen
+  aus dem Zielrepo, auch wenn es ein anderes als das Repo aus `cwd` ist.
+  `--git-dir` und `--work-tree` werden getrennt oder mit `=` unterstützt; relative Werte
+  löst Git nach allen `-C` auf. Unbekannte globale Optionen (auch `-c`), fehlende Ziele,
+  Ziele ohne Arbeitsbaum und nicht auflösbare Kontexte blockieren mit Exit 2 und Begründung.
+- **Expansionen werden nicht ausgewertet.** `$` oder Backticks blockieren mit Exit 2,
+  auch in ansonsten harmlosen Befehlen. Ebenso blockieren nicht sicher zerlegbare Befehle
+  mit Kontextoptionen, `cd` oder `GIT_`-Zuweisungen. Eine breite Messung im ursprünglichen
+  Repo könnte sonst einen fremden Arbeitsbaum übersehen. Andere nicht zerlegbare Formen
+  werden weiterhin konservativ im Repo aus `cwd` gemessen; dies ist kein Shell-Interpreter.
 - **Ohne `jq` blockt er.** Ohne geparste Kommandozeile prüft er nichts — und ein Guard, der auf einem
   frisch aufgesetzten Rechner unbemerkt abgeschaltet ist, ist schlimmer als keiner. Fail-closed ist
   hier die einzige vertretbare Richtung.
@@ -111,24 +114,20 @@ Zusammenhang nicht.
 | `git add <pfad> …` · `git add -- <pfad>` | nur diese Pfade | `git add --dry-run -- <pfad> …` |
 | `git -C <ziel> add <pfad> …` · `git -C <ziel> add .` | nur diese Pfade, relativ zu `<ziel>` | `git -C <ziel> add --dry-run -- <pfad> …` |
 | `git commit <pfad> …` · `-i`/`-o <pfad>` | nur diese Pfade, nur Verfolgtes | `git add -u --dry-run -- <pfad> …` |
-| `$` oder Backticks, mit oder ohne Anführungszeichen | unbekannt | `git add -A --dry-run` im Repo aus `cwd` |
+| `$` oder Backticks, mit oder ohne Anführungszeichen | unbekannt | Exit 2, Kontext nicht sicher auflösbar |
 | alles andere, was sich nicht sicher zerlegen lässt | unbekannt | wie oben breit: `-A` (bzw. `-u` bei `-u`/`commit`) |
 
 Ohne diese Unterscheidung kommt ein Fehlalarm garantiert: `git add -u` bei gleichzeitig
 herumliegender, unverfolgter `.env` — und ebenso `git add notiz.md` neben derselben `.env`.
 
-**Gezielt messen heißt nicht raten.** Gezielt gemessen wird nur ein schlichter Befehl
-`git add|commit …` mit wörtlichen Pfaden. Kette (`&&`, `;`, `|`), Umleitung, `$VARIABLE`, `$(…)`,
-Backticks, Backslash, Platzhalter (`*`, `?`, `[`), Tilde, Pathspec-Magie (`:/`), `.`,
-`xargs`, vorangestellte globale Optionen oder unbekannte Optionen: Dann misst der Guard so breit
-wie zuvor. Einzige gelesene globale Option ist **genau ein** `git -C <ziel>` mit wörtlichem Pfad
-zu einem vorhandenen Verzeichnis: Dann misst der Guard in `<ziel>` (relativ zu `cwd`), und dort
-gilt auch `.` als gezielt messbar — `git -C sub add .` erfasst eine `.env` im Stamm nicht und
-blockt deshalb auch nicht. Mehrere `-C`, `-C` neben weiteren globalen Optionen, ein `-C`-Pfad aus
-Variable oder Substitution oder ein fehlendes Zielverzeichnis: breit wie zuvor. Der Fix darf Fehlalarme abbauen, aber nie Schutz. Den Ort des
-Befehls liest er aus dem Feld `cwd`. Auch die breite Messung und die Suche nach Schutzmustern
-verwenden dieses Repo. Fehlt `cwd`, ist es kein absolutes vorhandenes Verzeichnis oder liegt
-es außerhalb eines Repos, blockt der Guard einen prüfpflichtigen Befehl (Exit 2 mit Begründung auf stderr). Nebenbei erfasst die gezielte Messung `git add -f` auf eine
-ignorierte Datei, die die breite Messung übersieht. Ein **leeres** Messergebnis ist ein Ergebnis („nichts
-betroffen"), kein Fehlschlag — auf `git status` fällt der Guard nur zurück, wenn `--dry-run` selbst
-fehlschlägt.
+**Gezielt messen heißt nicht raten.** Wörtliche Pfade werden im aufgelösten Befehlsort
+vermessen. Nach `-C` gilt auch `.` als gezielt messbar: `git -C sub add .` erfasst eine
+`.env` im Stamm nicht. Unbekannte Add-Optionen, Globs und Pathspec-Magie führen weiterhin
+zur breiten Messung, soweit kein unsicherer Kontextwechsel vorliegt. Fehlt `cwd` oder ist
+es kein absolutes vorhandenes Verzeichnis, blockiert ein prüfpflichtiger Befehl mit Exit 2.
+`cwd` selbst darf außerhalb eines Repos liegen, wenn `-C` einen gültigen Arbeitsbaum bestimmt.
+
+Die gezielte Messung erfasst auch `git add -f` auf eine ignorierte Datei. Ein **leeres**
+Messergebnis bedeutet „nichts betroffen“; nur ein fehlgeschlagener Trockenlauf führt zur
+Statusmessung im selben Zielkontext. Die separaten Kontexttests führen kein echtes `git add`
+aus und prüfen nach jeder Probe, dass beide Indexe leer und keine Indexdateien entstanden sind.
