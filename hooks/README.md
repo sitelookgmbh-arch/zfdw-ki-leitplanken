@@ -84,17 +84,22 @@ schützt er gar nichts mehr.
 - Er unterscheidet nicht, ob `git add` ein Befehl oder Teil eines Zitats ist. Liegt gleichzeitig eine
   geschützte Datei im Arbeitsbaum, blockt er auch dann. Bewusst so.
 - **Reichweite des Git-Kontexts:** Wörtliche `-C` werden nacheinander aufgelöst,
-  relative Ziele jeweils vom vorherigen Verzeichnis aus, absolute Ziele unabhängig davon.
+  relative Ziele jeweils physisch vom vorherigen Verzeichnis aus (auch bei Symlinks und `..`),
+  absolute Ziele unabhängig davon.
   Ein leeres `-C` lässt den Ort unverändert. Repo-Wurzel, Schutzmuster und Messungen stammen
   aus dem Zielrepo, auch wenn es ein anderes als das Repo aus `cwd` ist.
   `--git-dir` und `--work-tree` werden getrennt oder mit `=` unterstützt; relative Werte
   löst Git nach allen `-C` auf. Unbekannte globale Optionen (auch `-c`), fehlende Ziele,
   Ziele ohne Arbeitsbaum und nicht auflösbare Kontexte blockieren mit Exit 2 und Begründung.
-- **Expansionen werden nicht ausgewertet.** `$` oder Backticks blockieren mit Exit 2,
-  auch in ansonsten harmlosen Befehlen. Ebenso blockieren nicht sicher zerlegbare Befehle
-  mit Kontextoptionen, `cd` oder `GIT_`-Zuweisungen. Eine breite Messung im ursprünglichen
-  Repo könnte sonst einen fremden Arbeitsbaum übersehen. Andere nicht zerlegbare Formen
-  werden weiterhin konservativ im Repo aus `cwd` gemessen; dies ist kein Shell-Interpreter.
+- **Expansionen werden nicht ausgewertet.** Nicht sicher zerlegbare Git-Befehle mit
+  `$` oder Backticks blockieren mit Exit 2. Wörtliche Zeichen in einfachen Anführungszeichen
+  bleiben bei zerlegbaren Befehlen erlaubt, etwa `git commit -m 'Preis 5$'`.
+  Nicht zerlegbare Befehle mit Kontextoptionen, `cd`, `pushd`, `popd`, Shell-Wrappern,
+  `eval`, `xargs` oder `GIT_`-Zuweisungen blockieren ebenfalls, auch in Subshells.
+  Eine breite Messung im ursprünglichen Repo könnte sonst einen fremden Arbeitsbaum übersehen.
+  Andere Expansionen (etwa `ls "$HOME"`) werden konservativ im Repo aus `cwd` breit gemessen;
+  im sauberen Repo laufen sie durch. Dies ist kein Shell-Interpreter: vollständig verschleierte
+  Befehle und selbst definierte Wrapper kann der Guard nicht zuverlässig zuordnen.
 - **Ohne `jq` blockt er.** Ohne geparste Kommandozeile prüft er nichts — und ein Guard, der auf einem
   frisch aufgesetzten Rechner unbemerkt abgeschaltet ist, ist schlimmer als keiner. Fail-closed ist
   hier die einzige vertretbare Richtung.

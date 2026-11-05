@@ -10,7 +10,7 @@ git init -q "$platz/ziel"
 printf 'start.dat\n' > "$platz/start/.geschuetzte-pfade"
 # Das Startrepo bleibt auch laut git status sauber, ohne einen Index anzulegen.
 mkdir -p "$platz/start/.git/info"
-printf '.geschuetzte-pfade\n' > "$platz/start/.git/info/exclude"
+printf '.geschuetzte-pfade\next\n' > "$platz/start/.git/info/exclude"
 [ -z "$(git -C "$platz/start" status --porcelain)" ] || exit 1
 printf '.env\nziel.dat\n' > "$platz/ziel/.geschuetzte-pfade"
 touch "$platz/ziel/.env" "$platz/ziel/ziel.dat" "$platz/ziel/start.dat"
@@ -48,6 +48,19 @@ probe 'Ziel fehlt' 2 "$platz/start" 'git -C ../fehlt add .'
 probe 'Variable' 2 "$platz/start" 'git -C "$ZIEL" add .env'
 probe 'Kette' 2 "$platz/start" 'true && git -C ../ziel add .env'
 probe 'Verzeichniswechsel in Kette' 2 "$platz/start" 'cd ../ziel && git add .env'
+probe 'Subshell mit cd' 2 "$platz/start" '(cd ../ziel && git add .env)'
+probe 'Shell mit cd' 2 "$platz/start" "bash -c 'cd ../ziel && git add .env'"
+probe 'pushd in Kette' 2 "$platz/start" 'pushd ../ziel && git add .env'
+probe 'Block mit cd' 2 "$platz/start" '{ cd ../ziel && git add .env; }'
+ln -s "$platz/ziel/sub" "$platz/start/ext"
+probe 'Symlink mit ..' 2 "$platz/start" 'git -C ext/.. add .env'
+probe 'logisches cwd mit ..' 2 "$platz/start/ext" 'git -C .. add .env'
+probe 'awk Dollarzeichen' 0 "$platz/start" "awk '{print \$1}' datei"
+probe 'grep Dollarzeichen' 0 "$platz/start" "grep -n 'x$' datei"
+probe 'ls Variable' 0 "$platz/start" 'ls "$HOME"'
+probe 'Commit mit literalem Dollarzeichen' 0 "$platz/start" "git commit -m 'Preis 5$'"
+probe 'dynamischer Unterbefehl' 2 "$platz/start" 'git "$AKTION" .env'
+probe 'eval dynamisch' 2 "$platz/start" 'eval "$BEFEHL"'
 probe 'unbekannte globale Option' 2 "$platz/start" 'git --unknown add .env'
 probe 'Konfiguration mit Glob' 2 "$platz/start" 'git -c core.worktree=../ziel add *.dat'
 probe 'git-dir/work-tree getrennt' 2 "$platz/start" "git --git-dir '$platz/ziel/.git' --work-tree '$platz/ziel' add .env"

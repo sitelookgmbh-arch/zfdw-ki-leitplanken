@@ -224,7 +224,7 @@ kontext_fehler() {
 }
 
 if [ "$modus" = hook ]; then
-  if [ "$substitution" -eq 0 ] && zerlege "$befehl" && [ "${tok[0]:-}" = git ]; then
+  if zerlege "$befehl" && [ "${tok[0]:-}" = git ]; then
     # Kontextoptionen in Reihenfolge lesen; niemals die Eingabe ausfuehren.
     kontext=()
     while [ "${tok[1]:-}" != add ] && [ "${tok[1]:-}" != commit ]; do
@@ -236,7 +236,7 @@ if [ "$modus" = hook ]; then
             /*) ziel="${tok[2]}" ;;
             *) ziel="$befehl_ort/${tok[2]}" ;;
           esac
-          ziel=$(cd "$ziel" 2>/dev/null && pwd -P) || kontext_fehler
+          ziel=$(cd -P "$ziel" 2>/dev/null && pwd -P) || kontext_fehler
           befehl_ort="$ziel"; mit_c=1
           tok=(git "${tok[@]:3}") ;;
         --git-dir | --work-tree)
@@ -262,7 +262,10 @@ if [ "$modus" = hook ]; then
     esac
   else
     # Dynamische oder verkettete Kontextwechsel duerfen nicht im cwd messen.
-    if [ "$substitution" -eq 1 ] || printf '%s' "$befehl" | grep -qE -- '(git[[:space:]]+-|--git-dir|--work-tree| -C|(^|[;&|[:space:]])cd[[:space:]]|GIT_)'; then
+    # Shell-Wrapper und Verzeichniswechsel auch hinter Klammern/Quotes erkennen.
+    unsicher="(git[[:space:]]+-|--git-dir|--work-tree| -C|(^|[;&|({'\"[:space:]])(cd|pushd|popd|eval|sh|bash|zsh|xargs)[[:space:]]|GIT_)"
+    if printf '%s' "$befehl" | grep -qE -- "$unsicher" \
+      || { [ "$substitution" -eq 1 ] && printf '%s' "$befehl" | grep -qE '(^|[^[:alnum:]_])git([^[:alnum:]_]|$)'; }; then
       kontext_fehler
     fi
   fi
