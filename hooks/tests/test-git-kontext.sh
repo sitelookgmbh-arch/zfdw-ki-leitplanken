@@ -8,6 +8,10 @@ mkdir -p "$platz/start" "$platz/ziel/sub" "$platz/leer"
 git init -q "$platz/start"
 git init -q "$platz/ziel"
 printf 'start.dat\n' > "$platz/start/.geschuetzte-pfade"
+# Das Startrepo bleibt auch laut git status sauber, ohne einen Index anzulegen.
+mkdir -p "$platz/start/.git/info"
+printf '.geschuetzte-pfade\n' > "$platz/start/.git/info/exclude"
+[ -z "$(git -C "$platz/start" status --porcelain)" ] || exit 1
 printf '.env\nziel.dat\n' > "$platz/ziel/.geschuetzte-pfade"
 touch "$platz/ziel/.env" "$platz/ziel/ziel.dat" "$platz/ziel/start.dat"
 fehl=0
