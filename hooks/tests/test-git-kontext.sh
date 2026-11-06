@@ -58,6 +58,22 @@ probe 'logisches cwd mit ..' 2 "$platz/start/ext" 'git -C .. add .env'
 probe 'awk Dollarzeichen' 0 "$platz/start" "awk '{print \$1}' datei"
 probe 'grep Dollarzeichen' 0 "$platz/start" "grep -n 'x$' datei"
 probe 'ls Variable' 0 "$platz/start" 'ls "$HOME"'
+probe 'grep git-Option mit Dollarzeichen' 0 "$platz/start" "grep -rn 'TODO$' --exclude-dir=.git ."
+probe 'ls git-Pfad mit Variable' 0 "$platz/start" 'ls "$HOME/.config/git"'
+probe 'find git-Pfad mit Variable' 0 "$platz/start" "find . -path '*/.git/*' -prune -o -name \"\$x\""
+probe 'git als Argument mit Variable' 0 "$platz/start" 'printf "%s" git "$x"'
+probe 'Git nach Semikolon mit Variable' 2 "$platz/start" 'echo x; git add "$f"'
+probe 'Git nach und mit Variable' 2 "$platz/start" 'true && git add "$f"'
+probe 'Git nach oder mit Variable' 2 "$platz/start" 'false || git add "$f"'
+probe 'Git nach Pipe mit Variable' 2 "$platz/start" 'echo x | git add "$f"'
+probe 'Git in Subshell mit Variable' 2 "$platz/start" '(git -C "$d" add .env)'
+probe 'Git in Substitution' 2 "$platz/start" 'x=$(git rev-parse HEAD)'
+probe 'Git in Block' 2 "$platz/start" '{ git add "$f"; }'
+probe 'Git in Backticks' 2 "$platz/start" 'x=`git rev-parse HEAD`'
+probe 'Git nach command' 2 "$platz/start" 'command git add "$f"'
+probe 'Git nach env' 2 "$platz/start" 'env git add "$f"'
+probe 'Git nach Zuweisung' 2 "$platz/start" 'x=y git add "$f"'
+probe 'Git nach Shell-Wrapper' 2 "$platz/start" "bash -c 'git add \"\$f\"'"
 probe 'Commit mit literalem Dollarzeichen' 0 "$platz/start" "git commit -m 'Preis 5$'"
 probe 'Commit Dollarzeichen doppelt gequotet' 2 "$platz/start" 'git commit -m "Preis 5$"'
 probe 'Commit Substitution' 2 "$platz/start" 'git commit -m "$(printf text)"'

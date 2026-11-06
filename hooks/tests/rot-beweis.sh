@@ -105,5 +105,8 @@ mutante "lesende Git-Unterbefehle blockiert" '{sub(/\*\) break ;; # Anderer Unte
 # Nicht zerlegbare Git-Nachrichten wieder breit statt fail-closed behandeln.
 mutante "Git-Nachrichten mit Expansion durchgelassen" '/\|\| \{ \[ "\$substitution" -eq 1 \] &&/{print "      || false; then"; next} {print}'
 
+# Pfad- und Optionsteile duerfen die Expansionssperre nicht ausloesen.
+mutante "Wortteil git sperrt" '/git_position=/{print "    git_position=git"; next} {print}'
+
 echo "$erkannt erkannt, $blind blind"
 [ "$blind" -eq 0 ]

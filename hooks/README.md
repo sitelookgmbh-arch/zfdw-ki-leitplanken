@@ -92,7 +92,9 @@ schützt er gar nichts mehr.
   löst Git nach allen `-C` auf. Unbekannte globale Optionen (auch `-c`), fehlende Ziele,
   Ziele ohne Arbeitsbaum und nicht auflösbare Kontexte blockieren mit Exit 2 und Begründung.
 - **Expansionen werden nicht ausgewertet.** Nicht sicher zerlegbare Git-Befehle mit
-  `$` oder Backticks blockieren mit Exit 2. Wörtliche Zeichen in einfachen Anführungszeichen
+  `$` oder Backticks blockieren mit Exit 2, wenn Git in Befehlsposition steht
+  (auch nach Verkettungen, bekannten Wrappern oder in Substitutionen).
+  `.git`, `/git/` und `--exclude-dir=.git` allein lösen diese Sperre nicht aus. Wörtliche Zeichen in einfachen Anführungszeichen
   bleiben bei zerlegbaren Befehlen erlaubt, etwa `git commit -m 'Preis 5$'`.
   Gegenüber der früheren breiten Messung ist dies eine Verschärfung: Auch
   `git commit -m "Preis 5$"` und Commit-Nachrichten über `$(cat <<'EOF' … EOF)`
@@ -106,6 +108,7 @@ schützt er gar nichts mehr.
   Andere Expansionen (etwa `ls "$HOME"`) werden konservativ im Repo aus `cwd` breit gemessen;
   im sauberen Repo laufen sie durch. Dies ist kein Shell-Interpreter: vollständig verschleierte
   Befehle und selbst definierte Wrapper kann der Guard nicht zuverlässig zuordnen.
+  Auch Wrapper mit eigenem Verzeichniswechsel wie `env --chdir` werden nicht aufgelöst.
 - **Ohne `jq` blockt er.** Ohne geparste Kommandozeile prüft er nichts — und ein Guard, der auf einem
   frisch aufgesetzten Rechner unbemerkt abgeschaltet ist, ist schlimmer als keiner. Fail-closed ist
   hier die einzige vertretbare Richtung.
@@ -125,7 +128,10 @@ Zusammenhang nicht.
 | `git add <pfad> …` · `git add -- <pfad>` | nur diese Pfade | `git add --dry-run -- <pfad> …` |
 | `git -C <ziel> add <pfad> …` · `git -C <ziel> add .` | nur diese Pfade, relativ zu `<ziel>` | `git -C <ziel> add --dry-run -- <pfad> …` |
 | `git commit <pfad> …` · `-i`/`-o <pfad>` | nur diese Pfade, nur Verfolgtes | `git add -u --dry-run -- <pfad> …` |
-| `$` oder Backticks, mit oder ohne Anführungszeichen | unbekannt | Exit 2, Kontext nicht sicher auflösbar |
+| Zerlegbares `git commit -m 'Preis 5$'` | kein eigenes Staging | keine Messung; Indexprüfung im pre-commit-Hook |
+| Zerlegbares `git grep -n 'TODO$'` | konservativ auch Unverfolgtes im Zielkontext | `git add -A --dry-run` |
+| Nicht zerlegbarer Git-Aufruf mit `$` oder Backticks, etwa `git add "$f"` | unbekannt | Exit 2, Kontext nicht sicher auflösbar |
+| Nicht-Git-Befehl mit `$` oder Backticks, etwa `ls "$HOME/.config/git"`, ohne unsicheren Kontextwechsel | konservativ auch Unverfolgtes aus `cwd` | `git add -A --dry-run`; sauberer Arbeitsbaum: Exit 0 |
 | alles andere, was sich nicht sicher zerlegen lässt | unbekannt | wie oben breit: `-A` (bzw. `-u` bei `-u`/`commit`) |
 
 Ohne diese Unterscheidung kommt ein Fehlalarm garantiert: `git add -u` bei gleichzeitig

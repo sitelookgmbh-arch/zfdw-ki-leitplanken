@@ -265,8 +265,13 @@ if [ "$modus" = hook ]; then
     # Dynamische oder verkettete Kontextwechsel duerfen nicht im cwd messen.
     # Shell-Wrapper und Verzeichniswechsel auch hinter Klammern/Quotes erkennen.
     unsicher="(git[[:space:]]+-|--git-dir|--work-tree| -C|(^|[;&|({'\"[:space:]])(cd|pushd|popd|eval|sh|bash|zsh|xargs)[[:space:]]|GIT_)"
+    # Git muss am Befehlsanfang stehen, nicht in .git, /git/ oder Optionen.
+    # Trennzeichen decken auch Subshells und Substitutionen ab. Bekannte
+    # Wrapper, Zuweisungen und Shell-Schluesselwoerter bleiben konservativ;
+    # deren Argumente werden hier nicht als Shell-Code ausgewertet.
+    git_position='(^|[;&|(`{]|[[:cntrl:]])[[:space:]]*((command|exec|env|sudo|nohup|time|then|do|else|if|while|until|!)[[:space:]]+|[A-Za-z_][A-Za-z0-9_]*=[^;&|]*[[:space:]]+)*["'"'"']?git["'"'"']?([[:space:]]|$)'
     if printf '%s' "$befehl" | grep -qE -- "$unsicher" \
-      || { [ "$substitution" -eq 1 ] && printf '%s' "$befehl" | grep -qE '(^|[^[:alnum:]_])git([^[:alnum:]_]|$)'; }; then
+      || { [ "$substitution" -eq 1 ] && printf '%s' "$befehl" | grep -qE -- "$git_position"; }; then
       kontext_fehler
     fi
   fi
