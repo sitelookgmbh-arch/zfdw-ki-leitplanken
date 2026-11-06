@@ -47,52 +47,9 @@ probe 'Start ohne Repo, Ziel gueltig' 2 "$platz/leer" "git -C '$platz/ziel' add 
 probe 'Ziel fehlt' 2 "$platz/start" 'git -C ../fehlt add .'
 probe 'Variable' 2 "$platz/start" 'git -C "$ZIEL" add .env'
 probe 'Kette' 2 "$platz/start" 'true && git -C ../ziel add .env'
-probe 'Verzeichniswechsel in Kette' 2 "$platz/start" 'cd ../ziel && git add .env'
-probe 'Subshell mit cd' 2 "$platz/start" '(cd ../ziel && git add .env)'
-probe 'Shell mit cd' 2 "$platz/start" "bash -c 'cd ../ziel && git add .env'"
-probe 'pushd in Kette' 2 "$platz/start" 'pushd ../ziel && git add .env'
-probe 'Block mit cd' 2 "$platz/start" '{ cd ../ziel && git add .env; }'
 ln -s "$platz/ziel/sub" "$platz/start/ext"
 probe 'Symlink mit ..' 2 "$platz/start" 'git -C ext/.. add .env'
 probe 'logisches cwd mit ..' 2 "$platz/start/ext" 'git -C .. add .env'
-probe 'awk Dollarzeichen' 0 "$platz/start" "awk '{print \$1}' datei"
-probe 'grep Dollarzeichen' 0 "$platz/start" "grep -n 'x$' datei"
-probe 'ls Variable' 0 "$platz/start" 'ls "$HOME"'
-probe 'grep git-Option mit Dollarzeichen' 0 "$platz/start" "grep -rn 'TODO$' --exclude-dir=.git ."
-probe 'ls git-Pfad mit Variable' 0 "$platz/start" 'ls "$HOME/.config/git"'
-probe 'find git-Pfad mit Variable' 0 "$platz/start" "find . -path '*/.git/*' -prune -o -name \"\$x\""
-probe 'git als Argument mit Variable' 0 "$platz/start" 'printf "%s" git "$x"'
-probe 'Git nach Semikolon mit Variable' 2 "$platz/start" 'echo x; git add "$f"'
-probe 'Git nach und mit Variable' 2 "$platz/start" 'true && git add "$f"'
-probe 'Git nach oder mit Variable' 2 "$platz/start" 'false || git add "$f"'
-probe 'Git nach Pipe mit Variable' 2 "$platz/start" 'echo x | git add "$f"'
-probe 'Git in Subshell mit Variable' 2 "$platz/start" '(git -C "$d" add .env)'
-probe 'Git in Substitution' 2 "$platz/start" 'x=$(git rev-parse HEAD)'
-probe 'Git in Block' 2 "$platz/start" '{ git add "$f"; }'
-probe 'Git in Backticks' 2 "$platz/start" 'x=`git rev-parse HEAD`'
-probe 'Git nach command' 2 "$platz/start" 'command git add "$f"'
-probe 'Git nach env' 2 "$platz/start" 'env git add "$f"'
-probe 'Git nach Zuweisung' 2 "$platz/start" 'x=y git add "$f"'
-probe 'Git nach Shell-Wrapper' 2 "$platz/start" "bash -c 'git add \"\$f\"'"
-probe 'Commit mit literalem Dollarzeichen' 0 "$platz/start" "git commit -m 'Preis 5$'"
-probe 'Commit Dollarzeichen doppelt gequotet' 2 "$platz/start" 'git commit -m "Preis 5$"'
-probe 'Commit Substitution' 2 "$platz/start" 'git commit -m "$(printf text)"'
-heredoc_befehl=$(cat <<'BEFEHL'
-git commit -m "$(cat <<'EOF'
-Text
-EOF
-)"
-BEFEHL
-)
-probe 'Commit Heredoc' 2 "$platz/start" "$heredoc_befehl"
-probe 'git grep Dollarzeichen' 0 "$platz/start" "git grep -n 'TODO$'"
-probe 'git log Dollarzeichen' 0 "$platz/start" "git log -G'^foo$'"
-probe 'git log zitiertes add' 0 "$platz/start" 'git log --grep "use git add"'
-probe 'git grep fremdes Repo breit' 2 "$platz/start" "git -C ../ziel grep -n 'TODO$'"
-probe 'dynamischer Unterbefehl' 2 "$platz/start" 'git "$AKTION" .env'
-probe 'eval dynamisch' 2 "$platz/start" 'eval "$BEFEHL"'
-probe 'unbekannte globale Option' 2 "$platz/start" 'git --unknown add .env'
-probe 'Konfiguration mit Glob' 2 "$platz/start" 'git -c core.worktree=../ziel add *.dat'
 probe 'git-dir/work-tree getrennt' 2 "$platz/start" "git --git-dir '$platz/ziel/.git' --work-tree '$platz/ziel' add .env"
 probe 'relative Kontextoptionen nach -C' 2 "$platz/start" 'git --git-dir=.git --work-tree=. -C ../ziel add .env'
 probe 'git-dir/work-tree harmlos' 0 "$platz/start" 'git -C ../ziel --git-dir=.git --work-tree=. add start.dat'

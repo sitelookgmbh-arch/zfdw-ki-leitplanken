@@ -15,6 +15,7 @@ darf. Begründung: [04 — Deterministische Guards](../methode/04_Deterministisc
 | `pre-commit.vorlage` | git pre-commit | Derselbe Guard mit `--staged`: prüft den Index, greift bei jedem, der committet |
 | `geschuetzte-pfade.vorlage` | — | Schutzmuster, projektspezifisch zu setzen |
 | `tests/test-guard.sh` | — | 72 bestehende Fälle plus separate Kontextproben mit zwei Repos — inkl. gezieltem `git add`, `git -C <pfad>` (gemessen im Zielverzeichnis), Codex-Eingabeformat, `--staged` und der Verdrahtung beider Vorlagen aus einem Unterordner |
+| `tests/test-verhaltensvergleich.py` | — | Exitcode-Vergleich mit `e983bd6`: ursprüngliche 72 Fälle und feste Shell-Beispiele; benötigt Python 3 und die Git-Historie |
 | `tests/rot-beweis.sh` | — | Rot-Beweis: absichtlich kaputte Guards, die Suite muss jeden bemerken |
 
 ## Einbau
@@ -89,26 +90,18 @@ schützt er gar nichts mehr.
   Ein leeres `-C` lässt den Ort unverändert. Repo-Wurzel, Schutzmuster und Messungen stammen
   aus dem Zielrepo, auch wenn es ein anderes als das Repo aus `cwd` ist.
   `--git-dir` und `--work-tree` werden getrennt oder mit `=` unterstützt; relative Werte
-  löst Git nach allen `-C` auf. Unbekannte globale Optionen (auch `-c`), fehlende Ziele,
+  löst Git nach allen `-C` auf. Unbekannte globale Optionen neben Kontextoptionen (auch `-c`), fehlende Ziele,
   Ziele ohne Arbeitsbaum und nicht auflösbare Kontexte blockieren mit Exit 2 und Begründung.
-- **Expansionen werden nicht ausgewertet.** Nicht sicher zerlegbare Git-Befehle mit
-  `$` oder Backticks blockieren mit Exit 2, wenn Git in Befehlsposition steht
-  (auch nach Verkettungen, bekannten Wrappern oder in Substitutionen).
-  `.git`, `/git/` und `--exclude-dir=.git` allein lösen diese Sperre nicht aus. Wörtliche Zeichen in einfachen Anführungszeichen
-  bleiben bei zerlegbaren Befehlen erlaubt, etwa `git commit -m 'Preis 5$'`.
-  Gegenüber der früheren breiten Messung ist dies eine Verschärfung: Auch
-  `git commit -m "Preis 5$"` und Commit-Nachrichten über `$(cat <<'EOF' … EOF)`
-  blockieren im sauberen Repo. Es gibt keine Sonderauswertung für Heredocs.
-  Andere zerlegbare Git-Unterbefehle, etwa `git grep -n 'TODO$'`, werden bei
-  anschlagendem Vorfilter breit im aufgelösten Zielkontext gemessen; geschützte
-  Dateien können daher auch lesende Befehle blockieren.
-  Nicht zerlegbare Befehle mit Kontextoptionen, `cd`, `pushd`, `popd`, Shell-Wrappern,
-  `eval`, `xargs` oder `GIT_`-Zuweisungen blockieren ebenfalls, auch in Subshells.
-  Eine breite Messung im ursprünglichen Repo könnte sonst einen fremden Arbeitsbaum übersehen.
-  Andere Expansionen (etwa `ls "$HOME"`) werden konservativ im Repo aus `cwd` breit gemessen;
-  im sauberen Repo laufen sie durch. Dies ist kein Shell-Interpreter: vollständig verschleierte
-  Befehle und selbst definierte Wrapper kann der Guard nicht zuverlässig zuordnen.
-  Auch Wrapper mit eigenem Verzeichniswechsel wie `env --chdir` werden nicht aufgelöst.
+- **Expansionen werden nicht ausgewertet.** Sobald `$` oder Backticks im Befehl stehen,
+  misst er breit mit `-A`, auch ohne wörtlich erkennbares `git add`. Das erfasst unquotierte
+  Substitutionen mit Leerzeichen und variable Unterbefehle, kann aber auch harmlose Befehle
+  oder wörtlich zitierte Dollarzeichen blockieren. Das Ziel einer dynamischen Verzeichniswahl
+  außerhalb des Repos aus `cwd` kann diese Messung nicht bestimmen. Liegt `cwd` außerhalb
+  eines Repos, blockt er deshalb auch Befehle ohne git wie `echo "$HOME"` mit Exit 2
+  und einer Begründung auf stderr.
+  Shell-Ausdrücke sowie `cd`-/`pushd`-Ketten werden weiterhin im Repo aus `cwd`
+  gemessen; deren tatsächliches Ziel wird nicht aufgelöst. Enthält ein unlesbarer
+  Befehl eine Kontextoption (`-C`, `--git-dir`, `--work-tree`), blockiert er.
 - **Ohne `jq` blockt er.** Ohne geparste Kommandozeile prüft er nichts — und ein Guard, der auf einem
   frisch aufgesetzten Rechner unbemerkt abgeschaltet ist, ist schlimmer als keiner. Fail-closed ist
   hier die einzige vertretbare Richtung.
@@ -128,10 +121,7 @@ Zusammenhang nicht.
 | `git add <pfad> …` · `git add -- <pfad>` | nur diese Pfade | `git add --dry-run -- <pfad> …` |
 | `git -C <ziel> add <pfad> …` · `git -C <ziel> add .` | nur diese Pfade, relativ zu `<ziel>` | `git -C <ziel> add --dry-run -- <pfad> …` |
 | `git commit <pfad> …` · `-i`/`-o <pfad>` | nur diese Pfade, nur Verfolgtes | `git add -u --dry-run -- <pfad> …` |
-| Zerlegbares `git commit -m 'Preis 5$'` | kein eigenes Staging | keine Messung; Indexprüfung im pre-commit-Hook |
-| Zerlegbares `git grep -n 'TODO$'` | konservativ auch Unverfolgtes im Zielkontext | `git add -A --dry-run` |
-| Nicht zerlegbarer Git-Aufruf mit `$` oder Backticks, etwa `git add "$f"` | unbekannt | Exit 2, Kontext nicht sicher auflösbar |
-| Nicht-Git-Befehl mit `$` oder Backticks, etwa `ls "$HOME/.config/git"`, ohne unsicheren Kontextwechsel | konservativ auch Unverfolgtes aus `cwd` | `git add -A --dry-run`; sauberer Arbeitsbaum: Exit 0 |
+| `$` oder Backticks, mit oder ohne Anführungszeichen | unbekannt | `git add -A --dry-run` im Repo aus `cwd` |
 | alles andere, was sich nicht sicher zerlegen lässt | unbekannt | wie oben breit: `-A` (bzw. `-u` bei `-u`/`commit`) |
 
 Ohne diese Unterscheidung kommt ein Fehlalarm garantiert: `git add -u` bei gleichzeitig

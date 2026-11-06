@@ -90,23 +90,11 @@ mutante "breite Messung ignoriert cwd" '/cd "\$mess_ort" \|\|/{print "  :"; next
 # Blockcodes allein reichen nicht: Ohne Begruendung ist die Sperre stumm.
 mutante "cwd-Blockgruende fehlen" '{gsub(/echo "BLOCKIERT — (cwd ist kein vorhandenes Verzeichnis\.|Wechsel nach cwd gescheitert; Befehl nicht messbar\.|Repo aus cwd nicht bestimmbar; Befehl nicht messbar\.)" >&2; /, "")} {print}'
 
-# Kontextwechsel hinter Klammern/Quotes bzw. pushd nicht mehr erkennen.
-mutante "Shell-Kontextwechsel uebersehen" '/unsicher=/{print "    unsicher=\"(git[[:space:]]+-|--git-dir|--work-tree| -C|(^|[;&|[:space:]])cd[[:space:]]|GIT_)\""; next} {print}'
 # Logisches cd verrechnet Symlinks mit .. gegen den falschen Arbeitsbaum.
 mutante "git -C logisch statt physisch" '{sub(/cd -P "\$ziel"/, "cd \"$ziel\"")} {print}'
-# Dollarzeichen wieder unabhaengig von der Befehlsart sperren.
-mutante "Dollarzeichen pauschal blockiert" '/if zerlege "\$befehl"/{print "  [ \"$substitution\" -eq 1 ] && kontext_fehler"} {print}'
 # Ein fehlgeschlagener Wechsel muss genau diesen Sicherheitszweig pruefen.
 mutante "cwd-Wechsel scheitert offen" '/cd "\$mess_ort" \|\|/{sub(/exit 2/, "exit 0")} {print}'
 
 echo
-# Andere Unterbefehle faelschlich als unbekannte Kontextoption sperren.
-mutante "lesende Git-Unterbefehle blockiert" '{sub(/\*\) break ;; # Anderer Unterbefehl/, "*) kontext_fehler ;; # Anderer Unterbefehl")} {print}'
-# Nicht zerlegbare Git-Nachrichten wieder breit statt fail-closed behandeln.
-mutante "Git-Nachrichten mit Expansion durchgelassen" '/\|\| \{ \[ "\$substitution" -eq 1 \] &&/{print "      || false; then"; next} {print}'
-
-# Pfad- und Optionsteile duerfen die Expansionssperre nicht ausloesen.
-mutante "Wortteil git sperrt" '/git_position=/{print "    git_position=git"; next} {print}'
-
 echo "$erkannt erkannt, $blind blind"
 [ "$blind" -eq 0 ]
