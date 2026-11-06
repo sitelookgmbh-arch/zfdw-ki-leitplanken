@@ -245,7 +245,8 @@ if [ "$modus" = hook ]; then
           tok=(git "${tok[@]:3}") ;;
         --git-dir=* | --work-tree=*)
           kontext+=("${tok[1]}"); tok=(git "${tok[@]:2}") ;;
-        *) kontext_fehler ;;
+        -* | '') kontext_fehler ;;
+        *) break ;; # Anderer Unterbefehl: breit im aufgeloesten Kontext messen.
       esac
     done
     mess_ort="$befehl_ort"

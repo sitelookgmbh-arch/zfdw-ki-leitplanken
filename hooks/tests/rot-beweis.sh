@@ -100,5 +100,10 @@ mutante "Dollarzeichen pauschal blockiert" '/if zerlege "\$befehl"/{print "  [ \
 mutante "cwd-Wechsel scheitert offen" '/cd "\$mess_ort" \|\|/{sub(/exit 2/, "exit 0")} {print}'
 
 echo
+# Andere Unterbefehle faelschlich als unbekannte Kontextoption sperren.
+mutante "lesende Git-Unterbefehle blockiert" '{sub(/\*\) break ;; # Anderer Unterbefehl/, "*) kontext_fehler ;; # Anderer Unterbefehl")} {print}'
+# Nicht zerlegbare Git-Nachrichten wieder breit statt fail-closed behandeln.
+mutante "Git-Nachrichten mit Expansion durchgelassen" '/\|\| \{ \[ "\$substitution" -eq 1 \] &&/{print "      || false; then"; next} {print}'
+
 echo "$erkannt erkannt, $blind blind"
 [ "$blind" -eq 0 ]

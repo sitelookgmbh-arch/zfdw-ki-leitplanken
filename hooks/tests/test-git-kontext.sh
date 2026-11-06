@@ -59,6 +59,20 @@ probe 'awk Dollarzeichen' 0 "$platz/start" "awk '{print \$1}' datei"
 probe 'grep Dollarzeichen' 0 "$platz/start" "grep -n 'x$' datei"
 probe 'ls Variable' 0 "$platz/start" 'ls "$HOME"'
 probe 'Commit mit literalem Dollarzeichen' 0 "$platz/start" "git commit -m 'Preis 5$'"
+probe 'Commit Dollarzeichen doppelt gequotet' 2 "$platz/start" 'git commit -m "Preis 5$"'
+probe 'Commit Substitution' 2 "$platz/start" 'git commit -m "$(printf text)"'
+heredoc_befehl=$(cat <<'BEFEHL'
+git commit -m "$(cat <<'EOF'
+Text
+EOF
+)"
+BEFEHL
+)
+probe 'Commit Heredoc' 2 "$platz/start" "$heredoc_befehl"
+probe 'git grep Dollarzeichen' 0 "$platz/start" "git grep -n 'TODO$'"
+probe 'git log Dollarzeichen' 0 "$platz/start" "git log -G'^foo$'"
+probe 'git log zitiertes add' 0 "$platz/start" 'git log --grep "use git add"'
+probe 'git grep fremdes Repo breit' 2 "$platz/start" "git -C ../ziel grep -n 'TODO$'"
 probe 'dynamischer Unterbefehl' 2 "$platz/start" 'git "$AKTION" .env'
 probe 'eval dynamisch' 2 "$platz/start" 'eval "$BEFEHL"'
 probe 'unbekannte globale Option' 2 "$platz/start" 'git --unknown add .env'

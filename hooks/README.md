@@ -94,6 +94,12 @@ schützt er gar nichts mehr.
 - **Expansionen werden nicht ausgewertet.** Nicht sicher zerlegbare Git-Befehle mit
   `$` oder Backticks blockieren mit Exit 2. Wörtliche Zeichen in einfachen Anführungszeichen
   bleiben bei zerlegbaren Befehlen erlaubt, etwa `git commit -m 'Preis 5$'`.
+  Gegenüber der früheren breiten Messung ist dies eine Verschärfung: Auch
+  `git commit -m "Preis 5$"` und Commit-Nachrichten über `$(cat <<'EOF' … EOF)`
+  blockieren im sauberen Repo. Es gibt keine Sonderauswertung für Heredocs.
+  Andere zerlegbare Git-Unterbefehle, etwa `git grep -n 'TODO$'`, werden bei
+  anschlagendem Vorfilter breit im aufgelösten Zielkontext gemessen; geschützte
+  Dateien können daher auch lesende Befehle blockieren.
   Nicht zerlegbare Befehle mit Kontextoptionen, `cd`, `pushd`, `popd`, Shell-Wrappern,
   `eval`, `xargs` oder `GIT_`-Zuweisungen blockieren ebenfalls, auch in Subshells.
   Eine breite Messung im ursprünglichen Repo könnte sonst einen fremden Arbeitsbaum übersehen.
