@@ -79,6 +79,35 @@ Was **nicht** hineingehört: Begründungen. Die Regel gehört in die Datei, das 
 Methoden-Dokument mit Link. Begründungen sind lang und werden selten gebraucht — aber wenn sie
 fehlen, wird die Regel beim nächsten Zweifel wegdiskutiert. Deshalb: verlinken, nicht streichen.
 
+## Kontext an Übergaben begrenzen
+
+Eine Verarbeitungskette kann dieselbe Eingabe mehrfach interpretieren: erst beim Erfassen,
+dann beim Zuordnen und nochmals beim Empfänger. Das kostet Laufzeit und Modellaufrufe; außerdem
+können Zahlen, Negationen oder Freigabevorbehalte bei jeder Interpretation abweichen. Eine kürzere
+Nachricht allein belegt deshalb weder eine Einsparung noch gleichbleibende Qualität.
+
+**Einmal strukturiert erfassen, danach vorhandene Felder verwenden.** Ein versioniertes Schema
+beschreibt den Arbeitsstand. Nachgelagerte Schritte übernehmen belegte Werte deterministisch.
+Fehlende oder widersprüchliche Angaben werden als solche behandelt; eine erneute Modellanalyse
+braucht einen benannten Anlass. Ungeprüfte Extraktion wird durch die Struktur nicht automatisch wahr.
+
+**Je Ziel nur das erforderliche Paket bilden.** Aufgabe, notwendige Fakten, Einschränkungen,
+Freigabevorbehalte und Referenz auf den Arbeitsstand müssen erhalten bleiben. Rohtext und
+Gesamthistorie werden nicht standardmäßig angehängt. Zusätzlicher Kontext wird bei einer konkreten
+Referenz oder einer festgestellten Informationslücke nachgeladen. Ob das Ziel die Daten erhalten
+darf, prüft die Übergabegrenze nach [10 — Fremdtext ist Daten](10_Fremdtext-ist-Daten.md).
+
+**Den gesamten fachlichen Auftrag vergleichen.** Eingabe-, Ausgabe- und Cache-Tokens sowie
+Wiederholungen und Modellaufrufe der Vorverarbeitung getrennt erfassen, soweit verfügbar.
+Laufzeit je Stufe und Ende zu Ende mit Median und p95 ausweisen; Stichprobengröße und
+Messbedingungen nennen. Fehlende Messwerte bleiben unbekannt und werden nicht als null gewertet.
+Verglichen werden dieselben synthetischen Aufgaben bei vergleichbarer Ergebnisqualität;
+Zeichenzahlen und einzelne schnelle Läufe ersetzen diesen Nachweis nicht.
+
+*Synthetischer Prüffall:* Ein Demo-Auftrag enthält eine Zahl, eine Negation und einen
+Freigabevorbehalt. Nach der strukturierten Erfassung müssen diese in jeder erforderlichen
+Zielprojektion erhalten bleiben. Eine Wiederholung der semantischen Analyse wird separat gezählt.
+
 ## Prüfen
 
 - [ ] Zeilenzahl unter dem Richtwert?
@@ -87,3 +116,7 @@ fehlen, wird die Regel beim nächsten Zweifel wegdiskutiert. Deshalb: verlinken,
 - [ ] Hat jede ausgelagerte Sektion noch ihren Anker?
 - [ ] Ist bei jeder Korrektur-Regel erkennbar, gegen welches Modell und welchen Fall sie entstand?
 - [ ] Wurden nach dem letzten Modellwechsel die K-Regeln aus der Zeit davor getestet?
+
+- [ ] Verwenden nachgelagerte Schritte vorhandene strukturierte Werte, statt sie ohne Anlass erneut zu interpretieren?
+- [ ] Bleiben Zahlen, Negationen und Freigabevorbehalte in den erforderlichen Zielpaketen erhalten?
+- [ ] Sind Gesamtverbrauch, Wiederholungen und Laufzeit bei vergleichbarer Qualität gemessen oder ausdrücklich unbekannt?

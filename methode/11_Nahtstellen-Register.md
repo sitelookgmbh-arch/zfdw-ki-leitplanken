@@ -61,6 +61,39 @@ Bedienfehler gehören ins Runbook. Ein Register, das alles aufnimmt, liest bald 
 Wie aus belegten Ablauffehlern technische Prüfregeln werden, beschreibt
 [12 — Lernschleife](12_Lernschleife.md).
 
+## Übergaben als prüfbare Verträge
+
+Ein synthetischer Fehlerfall: Ein Demo-Empfänger legt eine Aufgabe an, die Bestätigung geht auf
+dem Rückweg verloren. Der Absender sieht einen Fehler und sendet erneut. Fachlich entstehen zwei
+Aufgaben. Eine lokale Markierung „versendet“ löst diesen Fall nicht, weil Versand und entfernte
+Wirkung keine gemeinsame Transaktion bilden.
+
+Für automatisierte Übergaben beschreibt das Projekt einen kleinen Vertrag:
+
+| Bestandteil | Festlegung |
+|---|---|
+| Zuständigkeit | Erfassung, Arbeitsstand, Routing, Übergabeprüfung, Zieladapter und Register haben benannte Aufgaben; getrennte Dienste sind dafür nicht nötig. |
+| Datenformat | Versioniertes Schema, stabile Auftrags-/Fragmentkennung und eindeutige Zustände; Inhaltsänderungen sind von Wiederholungen unterscheidbar. |
+| Berechtigung | Zielzuordnung, Datenfreigabe und Ausführungsrecht getrennt bewerten. Unmittelbar vor der Wirkung prüft eine deterministische Grenze zulässige Felder und Aktionen. |
+| Zustellung | Der Zieladapter bestätigt die fachliche Annahme; Idempotenzschlüssel oder belastbarer Abgleich verhindern erneute Anlage nach verlorener Bestätigung. |
+| Wiederaufnahme | Schreibvorgänge und Zustandswechsel gegen Teilfehler und gleichzeitige Zugriffe absichern. Unklarer Zielzustand bleibt bis zur Klärung gesperrt. |
+| Parallelität | Unabhängige Aufgaben innerhalb einer festen Grenze parallel bearbeiten; gemeinsame Ressourcen und Reihenfolgeabhängigkeiten koordinieren. |
+| Nachweis | Stufenzeiten, Versuche, Fehler und Bestätigungen zuordnen, ohne geschützte Inhalte in Titel, Pfade oder Logs zu übernehmen. |
+
+Die konkrete Umsetzung gehört in die Projektentscheidung und verweist auf diese Methode.
+Ein Adapter ist unabhängig austauschbar, wenn der Vertrag außerhalb seines Codes beschrieben und
+mit synthetischen Fällen geprüft ist. Ein neues Modul braucht keine zusätzliche Modellanfrage;
+Kontextumfang und Verbrauch behandelt [03 — Kontext-Budget](03_Kontext-Budget.md).
+
+**Wiederanlauf prüfen:** dieselbe Eingabe erneut einlesen, vor und nach einem Zustandswechsel
+abbrechen, zwei Läufe gleichzeitig starten, bei mehreren Teilaufgaben eine scheitern lassen und
+eine Bestätigung nach erfolgreicher Zielanlage verlieren. Bereits bestätigte Teilaufgaben dürfen
+nicht erneut ausgeführt werden. Ohne Idempotenz oder Abgleich am Ziel darf der Absender nach
+unklarem Ausgang keine sichere einmalige Ausführung behaupten.
+
+Dies ist ein Prüfrahmen, kein Nachweis für ein konkretes System. Erst ein am benannten
+Implementierungsstand belegtes Gegenmittel macht einen Registereintrag „abgesichert“.
+
 ## Grenzen
 
 Ein Register verhindert keinen neuen Fehler. Es verhindert den zweiten Fehler gleicher Bauart.
@@ -73,3 +106,8 @@ Rot-Beweis): mit einer Probeänderung an einer eingetragenen Datei, die eine Ste
 - [ ] Liest das Review diese Stelle, und ist das mit einer Probeänderung belegt?
 - [ ] Hat jeder Eintrag ein Gegenmittel oder ein ausdrückliches „fehlt“?
 - [ ] Wird nach einer Übernahme geprüft, ob der laufende Prozess den neuen Stand wirklich ausführt?
+
+- [ ] Sind Schema, Kennungen, Zustände und Zuständigkeiten der Übergaben dokumentiert?
+- [ ] Werden Datenfreigabe und Ausführungsrecht unabhängig vom Routing unmittelbar vor der Wirkung geprüft?
+- [ ] Sind Wiederholung, Abbruch, Parallelstart, Teilfehler und verlorene Bestätigung mit synthetischen Fällen geprüft?
+- [ ] Verhindert das Ziel Duplikate, oder bleibt ein unklarer Zustellzustand bis zum Abgleich gesperrt?
