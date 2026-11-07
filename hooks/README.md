@@ -101,7 +101,9 @@ schützt er gar nichts mehr.
   und einer Begründung auf stderr.
   Shell-Ausdrücke sowie `cd`-/`pushd`-Ketten werden weiterhin im Repo aus `cwd`
   gemessen; deren tatsächliches Ziel wird nicht aufgelöst. Enthält ein unlesbarer
-  Befehl eine Kontextoption (`-C`, `--git-dir`, `--work-tree`), blockiert er.
+  Befehl eine Kontextoption (`-C`, `--git-dir`, `--work-tree`) vor dem Unterbefehl
+  eines Git-Aufrufs, blockiert er. Gleichnamige Optionen anderer Programme lösen
+  diese Sperre nicht aus. Optionswerte wie `--namespace add` gelten dabei nicht als Unterbefehl.
 - **Ohne `jq` blockt er.** Ohne geparste Kommandozeile prüft er nichts — und ein Guard, der auf einem
   frisch aufgesetzten Rechner unbemerkt abgeschaltet ist, ist schlimmer als keiner. Fail-closed ist
   hier die einzige vertretbare Richtung.

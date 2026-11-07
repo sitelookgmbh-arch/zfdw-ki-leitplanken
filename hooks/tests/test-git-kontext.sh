@@ -35,6 +35,14 @@ if [ "${NUR_ROTPROBE:-0}" = 1 ]; then
   echo "Indexe nach jeder Probe leer und ohne Indexdatei; Fehler: $fehl"
   [ "$fehl" -eq 0 ]; exit $?
 fi
+probe 'make mit -C' 0 "$platz/start" 'make -C "$X"'
+probe 'tar mit -C' 0 "$platz/start" 'tar -C "$d" -xf x'
+probe 'grep mit -C' 0 "$platz/start" 'grep -C 3 "$m" f'
+probe 'Kontext nach namespace-Wert add' 2 "$platz/start" 'git --namespace add -C ../ziel add .env'
+probe 'Kontext nach namespace-Wert commit' 2 "$platz/start" 'git --namespace commit -C ../ziel add .env'
+probe 'Dynamischer Kontext nach namespace-Wert' 2 "$platz/start" 'git --namespace add -C "$ZIEL" add .env'
+probe 'Kontextwort nach Unterbefehl' 0 "$platz/start" 'git commit -m "$m" -- -C'
+probe 'Kontextwort nach Unterbefehl mit globaler Option' 0 "$platz/start" 'git --no-pager commit -m "$m" -- -C'
 probe 'Zielmuster gilt' 2 "$platz/start" "git -C '$platz/ziel' add ziel.dat"
 probe 'Startmuster gilt nicht' 0 "$platz/start" "git -C '$platz/ziel' add start.dat"
 probe 'mehrere relative -C' 2 "$platz/start" 'git -C ../ziel -C sub -C .. add .env'

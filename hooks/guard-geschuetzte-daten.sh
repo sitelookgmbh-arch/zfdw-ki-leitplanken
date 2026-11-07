@@ -228,8 +228,15 @@ if [ "$modus" = hook ]; then
     # Kontextoptionen in Reihenfolge lesen; niemals die Eingabe ausfuehren.
     kontext=()
     hat_kontext=0
-    for wort in "${tok[@]}"; do
-      case "$wort" in add|commit) break ;; -C|--git-dir|--git-dir=*|--work-tree|--work-tree=*) hat_kontext=1 ;; esac
+    wert_folgt=0
+    for wort in "${tok[@]:1}"; do
+      if [ "$wert_folgt" -eq 1 ]; then wert_folgt=0; continue; fi
+      case "$wort" in
+        -C|--git-dir|--git-dir=*|--work-tree|--work-tree=*) hat_kontext=1; break ;;
+        -c|--config-env|--namespace|--super-prefix) wert_folgt=1 ;;
+        -*) ;;
+        *) break ;; # Erst ein Wort ausserhalb eines Optionswerts ist der Unterbefehl.
+      esac
     done
     if [ "$hat_kontext" -eq 1 ]; then
       while [ "${tok[1]:-}" != add ] && [ "${tok[1]:-}" != commit ]; do
@@ -269,7 +276,10 @@ if [ "$modus" = hook ]; then
     esac
   else
     # Nur unlesbare Git-Kontextoptionen sperren; Shell-Verhalten bleibt gleich.
-    if printf '%s' "$befehl" | grep -qE -- '(^|[[:space:]])(-C|--git-dir|--work-tree)([=[:space:]]|$)'; then
+    # Optionen anderer Programme und Argumente nach dem Unterbefehl zaehlen
+    # nicht. Nur globale Optionen mit bekanntem Pflichtwert verbrauchen ein Wort.
+    GIT_KONTEXT_VOR='(^|[;&|]|\s)git\s+(((-c|--config-env|--namespace|--super-prefix)\s+("[^"]*"|'"'"'[^'"'"']*'"'"'|[^[:space:];&|]+)|-[^[:space:];&|]*)\s+)*'
+    if printf '%s' "$befehl" | grep -qE -- "${GIT_KONTEXT_VOR}(-C|--git-dir|--work-tree)([=[:space:]]|$)"; then
       kontext_fehler
     fi
   fi

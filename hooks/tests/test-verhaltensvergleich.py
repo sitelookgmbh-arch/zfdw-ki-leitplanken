@@ -23,7 +23,7 @@ printf '%s' "$input" | /bin/bash "$VERGLEICH_ALT" "$@" >/dev/null 2>&1
 alt=$?
 printf '%s' "$input" | /bin/bash "$VERGLEICH_NEU" "$@" >/dev/null 2>&1
 neu=$?
-if printf '%s' "$input" | /usr/bin/grep -qE -- '(-C|--git-dir|--work-tree)'; then
+if printf '%s' "$input" | jq -r '.tool_input.command // empty' | /usr/bin/grep -qE -- '(^|[;&|[:space:]])git[[:space:]]+(-C|--git-dir|--work-tree)([=[:space:]]|$)'; then
   art=Kontext
 else
   art=Vergleich
@@ -49,6 +49,7 @@ exit "$neu"
     commands = ["grep -rn 'TODO$' --exclude-dir=.git .", "git commit -m 'Preis 5$'",
                 'echo x; git add "$f"', 'cd ../b && git add .env', '(git add .env)',
                 'x=$(git rev-parse HEAD)', 'pushd ../b && git add .env',
+                'make -C "$X"', 'tar -C "$d" -xf x', 'grep -C 3 "$m" f',
                 'git --unknown add .env', 'git -c core.worktree=../b add *.dat']
     for protected in (False, True):
         if protected:
