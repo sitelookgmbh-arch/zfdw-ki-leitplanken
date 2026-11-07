@@ -118,7 +118,7 @@ mit_ort() { # name  erwarteter_code  ort  befehl
   local code meldung
   printf '{"cwd":"%s","tool_input":{"command":"%s"}}' "$3" "$4" | "$GUARD" >/dev/null 2>"$arbeitsplatz/stderr"; code=$?
   meldung=$(cat "$arbeitsplatz/stderr")
-  if [ "$code" -eq "$2" ] && { [ "$2" -ne 2 ] || [[ "$meldung" == *BLOCKIERT* ]]; }; then printf '  ok    %-46s (Code %s)\n' "$1" "$code"; ok=$((ok+1))
+  if [ "$code" -eq "$2" ] && { [ "$2" -ne 2 ] || [[ "$meldung" == *"${5:-BLOCKIERT}"* ]]; }; then printf '  ok    %-46s (Code %s)\n' "$1" "$code"; ok=$((ok+1))
   else printf '  FEHL  %-46s (Code %s, erwartet %s; stderr: %s)\n' "$1" "$code" "$2" "$meldung"; fehl=$((fehl+1)); fi
 }
 mit_ort "cwd Unterordner, add notiz.md"       0 "$arbeitsplatz/docs" "git add notiz.md"
@@ -174,7 +174,7 @@ mit_ort "Dollarzeichen ohne git, cwd ohne Repo" 2 "$ohne_repo" 'echo $HOME'
 mit_ort "Backticks ohne git, cwd ohne Repo" 2 "$ohne_repo" 'echo `pwd`'
 # Verzeichniswechsel deterministisch scheitern lassen, auch mit Root-Rechten.
 printf 'cd() { return 1; }\n' > "$arbeitsplatz/cd-fehler.sh"
-BASH_ENV="$arbeitsplatz/cd-fehler.sh" mit_ort "cd scheitert mit Blockgrund" 2 "$arbeitsplatz" 'echo $HOME'
+BASH_ENV="$arbeitsplatz/cd-fehler.sh" mit_ort "cd scheitert mit Blockgrund" 2 "$arbeitsplatz" 'git add -A' 'Wechsel nach cwd gescheitert'
 rm -f "$arbeitsplatz/cd-fehler.sh"
 cd "$arbeitsplatz" || exit 1
 rm -rf "$hook_ort" "$ohne_repo" fremd
@@ -261,5 +261,6 @@ fi
 rm -f .env
 
 echo
+if ! GUARD="$GUARD" "$VORLAGEN/tests/test-git-kontext.sh"; then fehl=$((fehl+1)); fi
 echo "$ok bestanden, $fehl fehlgeschlagen"
 [ "$fehl" -eq 0 ]

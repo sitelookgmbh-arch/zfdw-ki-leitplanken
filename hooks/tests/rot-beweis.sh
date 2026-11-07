@@ -90,6 +90,11 @@ mutante "breite Messung ignoriert cwd" '/cd "\$mess_ort" \|\|/{print "  :"; next
 # Blockcodes allein reichen nicht: Ohne Begruendung ist die Sperre stumm.
 mutante "cwd-Blockgruende fehlen" '{gsub(/echo "BLOCKIERT — (cwd ist kein vorhandenes Verzeichnis\.|Wechsel nach cwd gescheitert; Befehl nicht messbar\.|Repo aus cwd nicht bestimmbar; Befehl nicht messbar\.)" >&2; /, "")} {print}'
 
+# Logisches cd verrechnet Symlinks mit .. gegen den falschen Arbeitsbaum.
+mutante "git -C logisch statt physisch" '{sub(/cd -P "\$ziel"/, "cd \"$ziel\"")} {print}'
+# Ein fehlgeschlagener Wechsel muss genau diesen Sicherheitszweig pruefen.
+mutante "cwd-Wechsel scheitert offen" '/cd "\$mess_ort" \|\|/{sub(/exit 2/, "exit 0")} {print}'
+
 echo
 echo "$erkannt erkannt, $blind blind"
 [ "$blind" -eq 0 ]

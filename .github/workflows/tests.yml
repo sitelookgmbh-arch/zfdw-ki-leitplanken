@@ -36,6 +36,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+          fetch-depth: 0
 
       - name: Werkzeugstand
         run: |
@@ -45,6 +46,9 @@ jobs:
 
       - name: Guard-Testsuite
         run: hooks/tests/test-guard.sh
+
+      - name: Verhaltensvergleich mit dem Ausgangsstand
+        run: python3 hooks/tests/test-verhaltensvergleich.py
 
       - name: Rot-Beweis (jede Mutante muss die Suite rot machen)
         run: hooks/tests/rot-beweis.sh
